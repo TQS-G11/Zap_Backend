@@ -1,2 +1,2 @@
-# Zap_Backend
-Backend for the Zap Web Store
+# Zap_Store
+WebApp for the Zap Store
