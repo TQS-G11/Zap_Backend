@@ -71,6 +71,10 @@ class RESTControllerWithServiceMockTest {
     }
 
 
+    @Test
+    void mockFailTest(){
+        assert(false);
+    }
 
 
 }
