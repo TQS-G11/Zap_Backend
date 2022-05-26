@@ -30,8 +30,23 @@ class RESTControllerWithServiceMockTest {
     private ZapService service;
 
 
-    @BeforeEach
-    void setUp(){
+    // @BeforeEach
+    // void setUp(){
+
+    //     ArrayList<Product> products = new ArrayList<>(){
+    //         {
+    //             add(new Product(1, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, 1, 15.5));
+    //             add(new Product(1, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, 1, 3));
+    //             add(new Product(1, "Charger 3", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 10, 1, 1000));
+    //         }
+    //     }; 
+
+    //     when(service.getProducts()).thenReturn(products);
+    // }
+
+
+    @Test
+    void getAllProducts() throws Exception{
 
         ArrayList<Product> products = new ArrayList<>(){
             {
@@ -42,11 +57,6 @@ class RESTControllerWithServiceMockTest {
         }; 
 
         when(service.getProducts()).thenReturn(products);
-    }
-
-
-    @Test
-    void getAllProducts() throws Exception{
 
         mvc.perform(
             get("/zap/products").contentType(MediaType.APPLICATION_JSON))
