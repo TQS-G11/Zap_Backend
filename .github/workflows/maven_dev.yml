@@ -1,19 +1,27 @@
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Java CI with Maven
+name: Run Maven Tests
 
 on:
   push:
-    branches: [ dev ]
+    branches: [ main,dev ]
   pull_request:
-    branches: [ dev ]
+    branches: [ main,dev ]
+
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+  #  services:
+  #    # Label used to access the service container
+  #    mysql:
+  #      # Docker Hub image
+  #      image: mysql
+  #      #
+  #      ports:
+  #       # Opens tcp port 6379 on the host and service container
+  #        - 3306:3306
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17
@@ -22,7 +30,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build DB
-      run: docker-compose -f "./docker_compose.yml" up -d --build db
-    - name: Run Maven Tests
-      run: mvn --batch-mode --update-snapshots verify
+    - name: Build and Run Tests
+      run: docker-compose -f "docker_compose_test.yml" up --build -d
+    - name: Get test result
+      run: docker-compose logs -f app
+    - name: Stop containers
+      if: always()
+      run: docker-compose down
+   
