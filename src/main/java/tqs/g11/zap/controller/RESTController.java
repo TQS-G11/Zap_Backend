@@ -23,7 +23,7 @@ public class RESTController {
     private ZapService service;
 
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getAlLProducts() {
+    public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> data = service.getProducts();
         return ResponseEntity.ok().body(data);
     }

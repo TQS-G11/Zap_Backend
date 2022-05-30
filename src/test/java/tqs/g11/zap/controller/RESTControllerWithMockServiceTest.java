@@ -17,8 +17,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import tqs.g11.zap.auth.DefaultPasswordEncoder;
+import tqs.g11.zap.auth.JwtAuthenticationFilter;
+import tqs.g11.zap.auth.TokenProvider;
+import tqs.g11.zap.auth.UnauthorizedEntryPoint;
 import tqs.g11.zap.data.Product;
 import tqs.g11.zap.service.ZapService;
+import tqs.g11.zap.service.UsersService;
 
 @WebMvcTest(RESTController.class)
 class RESTControllerWithServiceMockTest {
@@ -28,6 +33,15 @@ class RESTControllerWithServiceMockTest {
 
     @MockBean
     private ZapService service;
+
+    @MockBean
+    private UsersService service2;
+
+    @MockBean
+    private UnauthorizedEntryPoint u;
+
+    @MockBean
+    private TokenProvider t;
 
     @Test
     void getAllProducts() throws Exception{
