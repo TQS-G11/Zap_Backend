@@ -29,30 +29,14 @@ class RESTControllerWithServiceMockTest {
     @MockBean
     private ZapService service;
 
-
-    // @BeforeEach
-    // void setUp(){
-
-    //     ArrayList<Product> products = new ArrayList<>(){
-    //         {
-    //             add(new Product(1, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, 1, 15.5));
-    //             add(new Product(1, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, 1, 3));
-    //             add(new Product(1, "Charger 3", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 10, 1, 1000));
-    //         }
-    //     }; 
-
-    //     when(service.getProducts()).thenReturn(products);
-    // }
-
-
     @Test
     void getAllProducts() throws Exception{
 
         ArrayList<Product> products = new ArrayList<>(){
             {
-                add(new Product(1, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, 1, 15.5));
-                add(new Product(1, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, 1, 3));
-                add(new Product(1, "Charger 3", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 10, 1, 1000));
+                add(new Product(1l, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, 1, 15.5));
+                add(new Product(2l, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, 1, 3));
+                add(new Product(3l, "Charger 3", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 10, 1, 1000));
             }
         }; 
 
@@ -72,9 +56,23 @@ class RESTControllerWithServiceMockTest {
 
 
     @Test
-    void mockFailTest(){
-        assert(false);
+    void getProductById() throws Exception{
+
+        Product testProduct = new Product(1l, "Amogi Pen", 
+                                            "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", 
+                                            "", 4, 1, 15.5
+                                        );
+
+        when(service.getProductById(1l)).thenReturn(testProduct);
+
+        mvc.perform(
+            get("/zap/products").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name", is("Amogi Pen")))
+            .andExpect(jsonPath("$.quantity", is(4)));
     }
+
+
 
 
 }

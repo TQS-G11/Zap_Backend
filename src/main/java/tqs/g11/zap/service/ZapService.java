@@ -12,5 +12,9 @@ public class ZapService {
     public List<Product> getProducts() {
         return null;
     }
+
+    public Product getProductById(Long id) {
+        return null;
+    }
     
 }

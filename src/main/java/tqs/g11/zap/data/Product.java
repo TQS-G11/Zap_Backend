@@ -2,7 +2,7 @@ package tqs.g11.zap.data;
 
 public class Product {
     
-    private int id;
+    private Long id;
     private String name;
     private String img;
     private String description;
@@ -10,7 +10,7 @@ public class Product {
     private int owner;
     private double price;
     
-    public Product(int id, String name, String img, String description, int quantity, int owner, double price) {
+    public Product(Long id, String name, String img, String description, int quantity, int owner, double price) {
         this.id = id;
         this.name = name;
         this.img = img;
@@ -20,11 +20,11 @@ public class Product {
         this.price = price;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
