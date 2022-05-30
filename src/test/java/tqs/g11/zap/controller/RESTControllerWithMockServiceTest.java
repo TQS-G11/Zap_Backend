@@ -66,13 +66,9 @@ class RESTControllerWithServiceMockTest {
         when(service.getProductById(1l)).thenReturn(testProduct);
 
         mvc.perform(
-            get("/zap/products").contentType(MediaType.APPLICATION_JSON))
+            get("/zap/products/1").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name", is("Amogi Pen")))
             .andExpect(jsonPath("$.quantity", is(4)));
     }
-
-
-
-
 }
