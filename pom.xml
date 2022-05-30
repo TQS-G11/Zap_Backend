@@ -14,7 +14,7 @@
 	<name>Zap</name>
 	<description>Backend for the Zap Electronics store.</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>11</java.version>
 		<testcontainers.version>1.17.2</testcontainers.version>
 	</properties>
 	<dependencies>
@@ -25,6 +25,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
