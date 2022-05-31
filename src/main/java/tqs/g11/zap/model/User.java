@@ -39,17 +39,6 @@ public class User {
     @Setter
     private String role;
 
-    @Getter
-    @Setter
-    private String companyStatus;
-
-    @Getter
-    @Setter
-    private String riderStatus;
-
-    @Getter
-    @Setter
-    private Double riderRating;
 
     public User(UserDto dto) {
         username = dto.getUsername();

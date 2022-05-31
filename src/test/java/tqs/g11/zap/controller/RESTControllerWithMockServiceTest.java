@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,13 +16,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import tqs.g11.zap.auth.DefaultPasswordEncoder;
-import tqs.g11.zap.auth.JwtAuthenticationFilter;
 import tqs.g11.zap.auth.TokenProvider;
 import tqs.g11.zap.auth.UnauthorizedEntryPoint;
-import tqs.g11.zap.data.Product;
-import tqs.g11.zap.service.ZapService;
+import tqs.g11.zap.enums.UserRoles;
+import tqs.g11.zap.model.Product;
+import tqs.g11.zap.model.User;
+import tqs.g11.zap.service.ProductService;
 import tqs.g11.zap.service.UsersService;
+
+import java.util.Optional;
 
 @WebMvcTest(RESTController.class)
 class RESTControllerWithServiceMockTest {
@@ -32,7 +33,7 @@ class RESTControllerWithServiceMockTest {
     private MockMvc mvc; 
 
     @MockBean
-    private ZapService service;
+    private ProductService service;
 
     @MockBean
     private UsersService service2;
@@ -46,11 +47,12 @@ class RESTControllerWithServiceMockTest {
     @Test
     void getAllProducts() throws Exception{
 
+        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
         ArrayList<Product> products = new ArrayList<>(){
             {
-                add(new Product(1l, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, 1, 15.5));
-                add(new Product(2l, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, 1, 3));
-                add(new Product(3l, "Charger 3", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 10, 1, 1000));
+                add(new Product(1l, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user, 15.5, "Pen Drive"));
+                add(new Product(2l, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, user, 3.0, "Cable"));
+                add(new Product(3l, "Charger 3", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 10, user, 1000.0, "Charger"));
             }
         }; 
 
@@ -72,12 +74,14 @@ class RESTControllerWithServiceMockTest {
     @Test
     void getProductById() throws Exception{
 
-        Product testProduct = new Product(1l, "Amogi Pen", 
-                                            "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", 
-                                            "", 4, 1, 15.5
-                                        );
+        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
 
-        when(service.getProductById(1l)).thenReturn(testProduct);
+
+        Product testProduct = new Product(1L, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user, 15.5, "Pen Drive");
+
+
+
+        when(service.getProductById(1L)).thenReturn(Optional.of(testProduct));
 
         mvc.perform(
             get("/zap/products/1").contentType(MediaType.APPLICATION_JSON))
