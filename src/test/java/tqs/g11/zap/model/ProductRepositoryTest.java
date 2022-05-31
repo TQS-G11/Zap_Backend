@@ -63,6 +63,28 @@ class ProductRepositoryTest {
                 tuple(test3.getId(), test3.getName())
             );
     }
+
+    @Test
+    void findProductsContainingName(){
+        Product test1 = new Product(1l, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, 1, 15.5);
+        Product test2 = new Product(2l, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, 5, 16.5);
+        Product test3 = new Product(3l, "AmogusPen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 7, 10, 7.5);
+  
+        entityManager.persist(test1);
+        entityManager.persist(test2);
+        entityManager.persist(test3);
+        entityManager.flush();
+
+        List<Product> allProducts= repository.findByNameProductsContains("Am");
+
+        assertThat(allProducts)
+            .hasSize(2)
+            .extracting(Product::getId, Product::getName)
+            .containsOnly(
+                tuple(test1.getId(), test1.getName()),
+                tuple(test3.getId(), test3.getName())
+            );
+    }
     
 
 }
