@@ -25,5 +25,13 @@ public class ProductService {
     public Optional<Product> getProductById(Long id) {
         return productRepository.getProductById(id);
     }
+
+    public List<Product> getProductsByName(String name) { return productRepository.findByNameContains(name); }
+
+    public List<Product> getProductsByCategory(String name) { return productRepository.findByCategoryContains(name); }
+
+    public List<Product> getProductsByNameAndCategory(String name, String category) {
+        return productRepository.findByNameContainsAndCategoryContains(name, category);
+    }
     
 }

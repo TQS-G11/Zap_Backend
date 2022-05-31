@@ -65,4 +65,31 @@ public class ServiceWithMockRepositoryTest {
         assertThat(product.get().getName()).isEqualTo("Notebook super charger");
 
     }
+
+    @Test
+    void getProductByName() {
+        List<Product> products = productService.getProductsByName("Among");
+
+        assertThat(products).hasSize(1);
+        assertThat(products.get(0).getName()).isEqualTo("Among Us Pen Drive");
+    }
+
+    @Test
+    void getProductByCategory() {
+        List<Product> products = productService.getProductsByCategory("Charger");
+
+        assertThat(products).hasSize(2);
+        assertThat(products.get(0).getName()).isEqualTo("Notebook super charger");
+        assertThat(products.get(1).getName()).isEqualTo("Cellphone super charger");
+
+    }
+
+    @Test
+    void getProductByNameAndCategory() {
+        List<Product> products = productService.getProductsByNameAndCategory("Cellphone", "Charger");
+
+        assertThat(products).hasSize(1);
+        assertThat(products.get(0).getName()).isEqualTo("Cellphone super charger");
+    }
+
 }
