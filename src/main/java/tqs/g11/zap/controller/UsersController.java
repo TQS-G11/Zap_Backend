@@ -1,5 +1,6 @@
 package tqs.g11.zap.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +17,7 @@ import tqs.g11.zap.service.UsersService;
 @CrossOrigin("*")
 @RequestMapping("/api/users")
 public class UsersController {
+    @Autowired
     private final UsersService usersService;
 
     private final AuthenticationManager authManager;
