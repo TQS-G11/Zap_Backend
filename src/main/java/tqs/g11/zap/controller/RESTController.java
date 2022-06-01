@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import tqs.g11.zap.data.Product;
+import tqs.g11.zap.model.Product;
 import tqs.g11.zap.service.ZapService;
 
 //@CrossOrigin

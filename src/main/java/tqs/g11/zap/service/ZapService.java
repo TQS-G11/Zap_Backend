@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import tqs.g11.zap.data.Product;
+import tqs.g11.zap.model.Product;
 
 @Service
 public class ZapService {
