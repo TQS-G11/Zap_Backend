@@ -1,8 +1,8 @@
 version: '2.1'
 services:
-  db:
+  zap_db:
     image: mysql
-    container_name: db
+    container_name: zap_db
     #restart: always
     environment:
         DB_SERVER_PORT: 3306
@@ -20,8 +20,8 @@ services:
       - '3306:3306'
     expose:
       - '3306'
-    #volumes:
-    #  - ./.docker-volumes/mysql/db_data:/var/lib/mysql
+    volumes:
+      - ./.docker-volumes/mysql/db_data:/var/lib/mysql
 
   #db_init:
   #   depends_on:
@@ -40,7 +40,7 @@ services:
   #  volumes:
   #    - ./target/api.war:/usr/local/tomcat/webapps/api.war
 
-  app:
+  zap_app:
     container_name: zap_backend
     image: maven-app:latest
     build: 
@@ -49,12 +49,12 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      db:
+      zap_db:
         condition: service_healthy
 
-    command: ["./mvnw","spring-boot:run"]
+    command: ["./mvnw","package"]
     environment:
-      - spring.datasource.url=jdbc:mysql://db:3306/mysql
+      - spring.datasource.url=jdbc:mysql://zap_db:3306/mysql
       - spring.datasource.username=root
       - spring.datasource.password=root
       - spring.jpa.database-platform=org.hibernate.dialect.MySQL5InnoDBDialect
@@ -64,4 +64,5 @@ services:
       interval: 20s
       timeout: 5s
       retries: 5
- 
+    volumes:
+      - ./.docker-volumes/zap_app/target/:/app/target
