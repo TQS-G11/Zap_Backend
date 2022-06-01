@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       
       - name: Start Containers
-        run: docker-compose -f "docker-compose.yml" up --build  --exit-code-from zap_app -d
+        run: docker-compose -f "docker-compose.yml" up --build  -d
    
       - name: Build and analyze
         env:
