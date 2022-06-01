@@ -49,10 +49,10 @@ public class Product {
     @Setter
     private String category;
 
-    @Getter
-    @Setter
-    @OneToMany(mappedBy = "product")
-    private List<CartProduct> carts;
+//    @Getter
+//    @Setter
+//    @OneToMany(mappedBy = "product")
+//    private List<CartProduct> carts;
 
     @Override
     public String toString() {

@@ -18,11 +18,13 @@ public class CartService {
     }
 
     public List<CartProduct> getCartsByUserId(Long id) {
-        return null;
+        return cartRepository.findByUserId(id);
     }
 
     public List<CartProduct> deleteCartsByUserId(Long id) {
-        return null;
+        List<CartProduct> cartProducts = this.getCartsByUserId(id);
+        cartRepository.deleteAll(cartProducts);
+        return cartProducts;
     }
 
 }

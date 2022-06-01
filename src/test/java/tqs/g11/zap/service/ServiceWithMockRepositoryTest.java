@@ -7,10 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tqs.g11.zap.enums.UserRoles;
+import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.model.User;
 import tqs.g11.zap.repository.ProductRepository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +40,8 @@ public class ServiceWithMockRepositoryTest {
 //        when(usersService.getAuthUser(any())).thenReturn(mockUser);
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        User user = usersService.getAuthUser((UserDetails) authentication.getPrincipal());
+        List<CartProduct> carts = new ArrayList<>();
+
         Product p1 = new Product(1L, "Among Us Pen Drive", "url1", "An Among Us pen drive", 69, user, 420.69, "Pen Drive");
         Product p2 = new Product(2L, "Notebook super charger", "url2", "A notebook charger", 40, user, 69.0, "Charger");
         Product p3 = new Product(3L, "Cellphone super charger", "url3", "An Among Us pen drive", 13, user, 23.4, "Charger");

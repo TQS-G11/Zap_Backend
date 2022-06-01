@@ -18,18 +18,20 @@ import tqs.g11.zap.service.ProductService;
 public class RESTController {
     
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+    private final CartService cartService;
 
-    @Autowired
-    private CartService cartService;
+    public RESTController(ProductService productService, CartService cartService) {
+        this.productService = productService;
+        this.cartService = cartService;
+    }
 
     @GetMapping("/products")
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> data = productService.getProducts();
         return ResponseEntity.ok().body(data);
     }
-    
+
     @GetMapping("/products/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
         Optional<Product> data = productService.getProductById(id);
@@ -44,7 +46,8 @@ public class RESTController {
 
     @DeleteMapping("/carts/user/{user_id}")
     public ResponseEntity<List<CartProduct>> deleteCartsByUserId(@PathVariable("user_id") Long userId) {
-        return null;
+        List<CartProduct> cartProducts = cartService.deleteCartsByUserId(userId);
+        return ResponseEntity.ok().body(cartProducts);
     }
 
 
