@@ -6,9 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "app_users")
+@Table(name = "product")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
@@ -44,10 +45,14 @@ public class Product {
     @Setter
     private Double price;
 
-
     @Getter
     @Setter
     private String category;
+
+    @Getter
+    @Setter
+    @OneToMany(mappedBy = "product")
+    private List<CartProduct> carts;
 
     @Override
     public String toString() {
