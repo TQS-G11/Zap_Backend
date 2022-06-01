@@ -22,8 +22,15 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       
+      - name: Start Containers
+        run: docker-compose -f "docker-compose.yml" up --build  --exit-code-from zap_app
+   
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=TQS-G11_Zap_Backend
+        
+      - name: Stop containers
+        if: always()
+        run: docker-compose down
