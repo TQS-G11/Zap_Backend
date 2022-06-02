@@ -21,6 +21,7 @@
 		<sonar.organization>tqs-g11</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.projectKey>TQS-G11_Zap_Backend</sonar.projectKey>
+		<sonar.projectName>Zap_Backend</sonar.projectName>
 	</properties>
 	<dependencies>
 		<dependency>
