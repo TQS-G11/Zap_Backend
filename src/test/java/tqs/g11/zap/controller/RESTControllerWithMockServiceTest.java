@@ -50,9 +50,9 @@ class RESTControllerWithServiceMockTest {
         User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
         ArrayList<Product> products = new ArrayList<>(){
             {
-                add(new Product(1l, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user, 15.5, "Pen Drive"));
-                add(new Product(2l, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, user, 3.0, "Cable"));
-                add(new Product(3l, "Charger 3", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 10, user, 1000.0, "Charger"));
+                add(new Product("Amogi Pen", "", user));
+                add(new Product("Charger 3", "", user));
+                add(new Product("AmogusPen", "", user));
             }
         }; 
 
@@ -62,23 +62,22 @@ class RESTControllerWithServiceMockTest {
             get("/zap/products").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(3)))
-            .andExpect(jsonPath("$[0].name", is("Amogi Pen")))
-            .andExpect(jsonPath("$[0].quantity", is(4)))
-            .andExpect(jsonPath("$[1].name", is("USB Cable")))
-            .andExpect(jsonPath("$[1].quantity", is(3)))
-            .andExpect(jsonPath("$[2].name", is("Charger 3")))
-            .andExpect(jsonPath("$[2].quantity", is(10)));
+            .andExpect(jsonPath("$[0].productName", is("Amogi Pen")))
+            .andExpect(jsonPath("$[0].owner.username", is(user.getUsername())))
+            .andExpect(jsonPath("$[1].productName", is("Charger 3")))
+            .andExpect(jsonPath("$[1].owner.username", is(user.getUsername())))
+            .andExpect(jsonPath("$[2].productName", is("AmogusPen")))
+            .andExpect(jsonPath("$[2].owner.username", is(user.getUsername())));
     }
 
 
     @Test
     void getProductById() throws Exception{
 
+        
         User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
 
-
-        Product testProduct = new Product(1L, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user, 15.5, "Pen Drive");
-
+        Product testProduct = new Product("Amogi Pen", "", user);
 
 
         when(service.getProductById(1L)).thenReturn(Optional.of(testProduct));
@@ -86,7 +85,7 @@ class RESTControllerWithServiceMockTest {
         mvc.perform(
             get("/zap/products/1").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.name", is("Amogi Pen")))
-            .andExpect(jsonPath("$.quantity", is(4)));
+            .andExpect(jsonPath("$.productName", is("Amogi Pen")))
+            .andExpect(jsonPath("$.owner.username", is(user.getUsername())));
     }
 }

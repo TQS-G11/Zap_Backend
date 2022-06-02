@@ -42,10 +42,10 @@ public class ServiceWithMockRepositoryTest {
         Product p2 = new Product(2L, "Notebook super charger", "url2", "A notebook charger", 40, user, 69.0, "Charger");
         Product p3 = new Product(3L, "Cellphone super charger", "url3", "An Among Us pen drive", 13, user, 23.4, "Charger");
 
-        when(productRepository.findByNameContains("Among")).thenReturn(List.of(p1));
-        when(productRepository.getProductById(2L)).thenReturn(Optional.of(p2));
+        when(productRepository.findByProductNameIgnoreCaseContaining("Among")).thenReturn(List.of(p1));
+        when(productRepository.getProductByProductId(2L)).thenReturn(Optional.of(p2));
         when(productRepository.findByCategoryContains("Charger")).thenReturn(Arrays.asList(p2, p3));
-        when(productRepository.findByNameContainsAndCategoryContains("Cellphone", "Charger")).thenReturn(List.of(p3));
+        when(productRepository.findByProductNameContainsAndCategoryContains("Cellphone", "Charger")).thenReturn(List.of(p3));
         when(productRepository.findAll()).thenReturn(Arrays.asList(p1, p2, p3));
     }
 
@@ -54,7 +54,7 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProducts();
 
         assertThat(products).hasSize(3);
-        assertThat(products.get(0).getName()).isEqualTo("Among Us Pen Drive");
+        assertThat(products.get(0).getProductName()).isEqualTo("Among Us Pen Drive");
     }
 
     @Test
@@ -62,7 +62,7 @@ public class ServiceWithMockRepositoryTest {
         Optional<Product> product = productService.getProductById(2L);
 
         assertThat(product.isEmpty()).isFalse();
-        assertThat(product.get().getName()).isEqualTo("Notebook super charger");
+        assertThat(product.get().getProductName()).isEqualTo("Notebook super charger");
 
     }
 
@@ -71,7 +71,7 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProductsByName("Among");
 
         assertThat(products).hasSize(1);
-        assertThat(products.get(0).getName()).isEqualTo("Among Us Pen Drive");
+        assertThat(products.get(0).getProductName()).isEqualTo("Among Us Pen Drive");
     }
 
     @Test
@@ -79,8 +79,8 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProductsByCategory("Charger");
 
         assertThat(products).hasSize(2);
-        assertThat(products.get(0).getName()).isEqualTo("Notebook super charger");
-        assertThat(products.get(1).getName()).isEqualTo("Cellphone super charger");
+        assertThat(products.get(0).getProductName()).isEqualTo("Notebook super charger");
+        assertThat(products.get(1).getProductName()).isEqualTo("Cellphone super charger");
 
     }
 
@@ -89,7 +89,7 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProductsByNameAndCategory("Cellphone", "Charger");
 
         assertThat(products).hasSize(1);
-        assertThat(products.get(0).getName()).isEqualTo("Cellphone super charger");
+        assertThat(products.get(0).getProductName()).isEqualTo("Cellphone super charger");
     }
 
 }
