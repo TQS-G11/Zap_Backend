@@ -9,20 +9,20 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "product")
+@Table(name = "app_products")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
-
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Setter
-    private Long id;
+    private Long productId;
 
     @Getter
     @Setter
-    private String name;
+    private String productName;
 
     @Getter
     @Setter
@@ -45,6 +45,15 @@ public class Product {
     @Setter
     private Double price;
 
+    public Product(String name, String description, User owner){
+        this.productName = name;
+        this.description = description;
+        this.owner = owner;
+        this.price = 0.0;
+        this.quantity = 0;
+        this.description = "";
+    }
+
     @Getter
     @Setter
     private String category;
@@ -56,7 +65,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product [description=" + description + ", id=" + id + ", img=" + img + ", name=" + name + ", owner="
+        return "Product [description=" + description + ", id=" + productId + ", img=" + img + ", name=" + productName + ", owner="
                 + owner.getUsername() + ", price=" + price + ", quantity=" + quantity + ", category=" + category + "]";
     }
 }
