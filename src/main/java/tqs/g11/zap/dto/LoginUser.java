@@ -1,14 +1,14 @@
-// package tqs.g11.zap.dto;
+package tqs.g11.zap.dto;
 
-// import lombok.Getter;
-// import lombok.Setter;
+import lombok.Getter;
+import lombok.Setter;
 
-// public class LoginUser {
-//     @Getter
-//     @Setter
-//     private String username;
+public class LoginUser {
+    @Getter
+    @Setter
+    private String username;
 
-//     @Getter
-//     @Setter
-//     private String password;
-// }
+    @Getter
+    @Setter
+    private String password;
+}

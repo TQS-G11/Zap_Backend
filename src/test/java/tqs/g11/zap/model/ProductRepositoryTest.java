@@ -26,9 +26,8 @@ class ProductRepositoryTest {
     @Test
     void getProductByIdTest() {
 
-        //Product test1 = new Product("Amogi Pen", "", 4);
-        Product test1 = new Product("AAA");
-        repository.save(test1);
+        Product test1 = new Product("Amogi Pen", "", 4);
+        entityManager.persistAndFlush(test1);
 
         // test if product exists
         Product found = repository.findById(test1.getProductId()).orElse(null);
@@ -41,59 +40,59 @@ class ProductRepositoryTest {
         entityManager.clear();
     }
 
-    // @Test
-    // void getAllProductsTest() {
+    @Test
+    void getAllProductsTest() {
 
-    //     Product test1 = new Product("Amogi Pen", "", 4);
-    //     Product test2 = new Product("AmogusPen", "", 3);
-    //     Product test3 = new Product("Charger 3", "", 7);
+         Product test1 = new Product("Amogi Pen", "", 4);
+         Product test2 = new Product("AmogusPen", "", 3);
+         Product test3 = new Product("Charger 3", "", 7);
 
-    //     entityManager.persist(test1);
-    //     entityManager.persist(test2);
-    //     entityManager.persist(test3);
-    //     entityManager.flush();
+        entityManager.persist(test1);
+        entityManager.persist(test2);
+        entityManager.persist(test3);
+        entityManager.flush();
  
 
-    //     List<Product> allProducts= repository.findAll();
+         List<Product> allProducts= repository.findAll();
           
 
-    //     assertThat(allProducts)
-    //         .hasSize(3)
-    //         .extracting(Product::getId, Product::getName)
-    //         .containsOnly(
-    //             tuple(test1.getId(), test1.getName()),
-    //             tuple(test2.getId(), test2.getName()),
-    //             tuple(test3.getId(), test3.getName())
-    //         );
+        assertThat(allProducts)
+            .hasSize(3)
+            .extracting(Product::getProductId, Product::getProductName)
+            .containsOnly(
+                tuple(test1.getProductId(), test1.getProductName()),
+                tuple(test2.getProductId(), test2.getProductName()),
+                tuple(test3.getProductId(), test3.getProductName())
+            );
 
-    //     entityManager.clear();
-    // }
+        entityManager.clear();
+    }
 
-    // @Test
-    // void findProductsContainingName(){
+    @Test
+    void findProductsContainingName(){
 
-    //     Product test1 = new Product("Amogi Pen", "", 4);
-    //     Product test2 = new Product("AmogusPen", "", 3);
-    //     Product test3 = new Product("Charger 3", "", 7);
+        Product test1 = new Product("Amogi Pen", "", 4);
+        Product test2 = new Product("Charger 3", "", 7);
+        Product test3 = new Product("AmogusPen", "", 3);
 
-    //     entityManager.persist(test1);
-    //     entityManager.persist(test2);
-    //     entityManager.persist(test3);
-    //     entityManager.flush();
+        entityManager.persist(test1);
+        entityManager.persist(test2);
+        entityManager.persist(test3);
+        entityManager.flush();
 
 
-    //     List<Product> allProducts= repository.findByNameIgnoreCaseContaining("Am");
+        List<Product> allProducts= repository.findByProductNameIgnoreCaseContaining("Am");
 
-    //     assertThat(allProducts)
-    //         .hasSize(2)
-    //         .extracting(Product::getId, Product::getName)
-    //         .containsOnly(
-    //             tuple(test1.getId(), test1.getName()),
-    //             tuple(test3.getId(), test3.getName())
-    //         );
+        assertThat(allProducts)
+            .hasSize(2)
+            .extracting(Product::getProductId, Product::getProductName)
+            .containsOnly(
+                tuple(test1.getProductId(), test1.getProductName()),
+                tuple(test3.getProductId(), test3.getProductName())
+            );
 
-    //     entityManager.clear();
-    // }
+        entityManager.clear();
+    }
     
 
 }

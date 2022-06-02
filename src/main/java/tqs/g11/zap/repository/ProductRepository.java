@@ -10,6 +10,6 @@ import tqs.g11.zap.model.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>  {
     
-    //List<Product> findByNameIgnoreCaseContaining(String name);
+    List<Product> findByProductNameIgnoreCaseContaining(String name);
 
 }

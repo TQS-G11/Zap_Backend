@@ -23,37 +23,32 @@ public class Product {
     @Setter
     private String productName;
 
-    // @Getter
-    // @Setter
-    // private String img;
+    @Getter
+    @Setter
+    private String img;
 
-    // @Getter
-    // @Setter
-    // private String description;
+    @Getter
+    @Setter
+    private String description;
 
-    // @Getter
-    // @Setter
-    // private Integer quantity;
+    @Getter
+    @Setter
+    private Integer quantity;
 
-    // @Getter
-    // @Setter
-    // private int ownerId;
+    @Getter
+    @Setter
+    private int ownerId;
 
-    // @Getter
-    // @Setter
-    // private Double price;
+    @Getter
+    @Setter
+    private Double price;
 
-    // public Product(String name, String description, int owner){
-    //     this.productName = name;
-    //     this.description = description;
-    //     this.ownerId = owner;
-    //     this.price = 0.0;
-    //     this.quantity = 0;
-    //     this.description = "";
-    // }
-
-    public Product(String name){
+    public Product(String name, String description, int ownerId){
         this.productName = name;
+        this.description = description;
+        this.ownerId = ownerId;
+        this.price = 0.0;
+        this.quantity = 0;
+        this.description = "";
     }
-
 }
