@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,13 +16,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import tqs.g11.zap.auth.DefaultPasswordEncoder;
-import tqs.g11.zap.auth.JwtAuthenticationFilter;
 import tqs.g11.zap.auth.TokenProvider;
 import tqs.g11.zap.auth.UnauthorizedEntryPoint;
+import tqs.g11.zap.enums.UserRoles;
 import tqs.g11.zap.model.Product;
-import tqs.g11.zap.service.ZapService;
+import tqs.g11.zap.model.User;
+import tqs.g11.zap.service.ProductService;
 import tqs.g11.zap.service.UsersService;
+
+import java.util.Optional;
 
 @WebMvcTest(RESTController.class)
 class RESTControllerWithServiceMockTest {
@@ -32,7 +33,7 @@ class RESTControllerWithServiceMockTest {
     private MockMvc mvc; 
 
     @MockBean
-    private ZapService service;
+    private ProductService service;
 
     @MockBean
     private UsersService service2;
@@ -46,11 +47,12 @@ class RESTControllerWithServiceMockTest {
     @Test
     void getAllProducts() throws Exception{
 
+        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
         ArrayList<Product> products = new ArrayList<>(){
             {
-                add(new Product("Amogi Pen", "", 4));
-                add(new Product("Charger 3", "", 7));
-                add(new Product("AmogusPen", "", 3));
+                add(new Product("Amogi Pen", "", user));
+                add(new Product("Charger 3", "", user));
+                add(new Product("AmogusPen", "", user));
             }
         }; 
 
@@ -61,25 +63,29 @@ class RESTControllerWithServiceMockTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(3)))
             .andExpect(jsonPath("$[0].productName", is("Amogi Pen")))
-            .andExpect(jsonPath("$[0].ownerId", is(4)))
+            .andExpect(jsonPath("$[0].owner.username", is(user.getUsername())))
             .andExpect(jsonPath("$[1].productName", is("Charger 3")))
-            .andExpect(jsonPath("$[1].ownerId", is(7)))
+            .andExpect(jsonPath("$[1].owner.username", is(user.getUsername())))
             .andExpect(jsonPath("$[2].productName", is("AmogusPen")))
-            .andExpect(jsonPath("$[2].ownerId", is(3)));
+            .andExpect(jsonPath("$[2].owner.username", is(user.getUsername())));
     }
 
 
     @Test
     void getProductById() throws Exception{
 
-        Product testProduct = new Product("Amogi Pen", "", 4);
+        
+        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
 
-        when(service.getProductById(1l)).thenReturn(testProduct);
+        Product testProduct = new Product("Amogi Pen", "", user);
+
+
+        when(service.getProductById(1L)).thenReturn(Optional.of(testProduct));
 
         mvc.perform(
             get("/zap/products/1").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.productName", is("Amogi Pen")))
-            .andExpect(jsonPath("$.ownerId", is(4)));
+            .andExpect(jsonPath("$.owner.username", is(user.getUsername())));
     }
 }

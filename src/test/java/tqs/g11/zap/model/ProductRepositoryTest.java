@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import tqs.g11.zap.enums.UserRoles;
 import tqs.g11.zap.repository.ProductRepository;
 
 @DataJpaTest
@@ -26,8 +27,12 @@ class ProductRepositoryTest {
     @Test
     void getProductByIdTest() {
 
-        Product test1 = new Product("Amogi Pen", "", 4);
-        entityManager.persistAndFlush(test1);
+        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
+
+        Product test1 = new Product("Amogi Pen", "", user);
+        entityManager.persist(user);
+        entityManager.persist(test1);
+        entityManager.flush();
 
         // test if product exists
         Product found = repository.findById(test1.getProductId()).orElse(null);
@@ -42,11 +47,13 @@ class ProductRepositoryTest {
 
     @Test
     void getAllProductsTest() {
+        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
 
-         Product test1 = new Product("Amogi Pen", "", 4);
-         Product test2 = new Product("AmogusPen", "", 3);
-         Product test3 = new Product("Charger 3", "", 7);
+        Product test1 = new Product("Amogi Pen", "", user);
+        Product test2 = new Product("AmogusPen", "", user);
+        Product test3 = new Product("Charger 3", "", user);
 
+        entityManager.persist(user);
         entityManager.persist(test1);
         entityManager.persist(test2);
         entityManager.persist(test3);
@@ -70,11 +77,13 @@ class ProductRepositoryTest {
 
     @Test
     void findProductsContainingName(){
+        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
 
-        Product test1 = new Product("Amogi Pen", "", 4);
-        Product test2 = new Product("Charger 3", "", 7);
-        Product test3 = new Product("AmogusPen", "", 3);
+        Product test1 = new Product("Amogi Pen", "", user);
+        Product test2 = new Product("Charger 3", "", user);
+        Product test3 = new Product("AmogusPen", "", user);
 
+        entityManager.persist(user);
         entityManager.persist(test1);
         entityManager.persist(test2);
         entityManager.persist(test3);

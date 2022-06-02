@@ -37,18 +37,29 @@ public class Product {
 
     @Getter
     @Setter
-    private int ownerId;
+    @ManyToOne
+    private User owner;
 
     @Getter
     @Setter
     private Double price;
 
-    public Product(String name, String description, int ownerId){
+    public Product(String name, String description, User owner){
         this.productName = name;
         this.description = description;
-        this.ownerId = ownerId;
+        this.owner = owner;
         this.price = 0.0;
         this.quantity = 0;
         this.description = "";
+    }
+
+    @Getter
+    @Setter
+    private String category;
+
+    @Override
+    public String toString() {
+        return "Product [description=" + description + ", id=" + productId + ", img=" + img + ", name=" + productName + ", owner="
+                + owner.getUsername() + ", price=" + price + ", quantity=" + quantity + ", category=" + category + "]";
     }
 }
