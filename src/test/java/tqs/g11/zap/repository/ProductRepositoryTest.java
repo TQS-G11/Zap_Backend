@@ -1,4 +1,4 @@
-package tqs.g11.zap.model;
+package tqs.g11.zap.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -12,7 +12,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import tqs.g11.zap.enums.UserRoles;
-import tqs.g11.zap.repository.ProductRepository;
+import tqs.g11.zap.model.Product;
+import tqs.g11.zap.model.User;
+
 
 @DataJpaTest
 class ProductRepositoryTest {
