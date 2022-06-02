@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -25,17 +27,34 @@ class ProductRepositoryTest {
     @Autowired
     private ProductRepository repository;
 
+    private User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
+
+    private Product test1 = new Product("Amogi Pen", "", user);
+    private Product test2 = new Product("Charger 3", "", user);
+    private Product test3 = new Product("AmogusPen", "", user);
+
+
+    @BeforeEach
+    void setUp(){
+
+        test1.setCategory("USB");            
+        test2.setCategory("Charger");        
+        test3.setCategory("USB");            
+
+        entityManager.persist(user);
+        entityManager.persist(test1);
+        entityManager.persist(test2);
+        entityManager.persist(test3);
+        entityManager.flush();
+    }
+    
+    @AfterEach
+    void clear(){
+        entityManager.clear();
+    }
 
     @Test
     void getProductByIdTest() {
-
-        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
-
-        Product test1 = new Product("Amogi Pen", "", user);
-        entityManager.persist(user);
-        entityManager.persist(test1);
-        entityManager.flush();
-
         // test if product exists
         Product found = repository.findById(test1.getProductId()).orElse(null);
         assertThat( found ).isEqualTo(test1);
@@ -43,17 +62,10 @@ class ProductRepositoryTest {
         // test that the product doesn't exist
         Optional<Product> fromDb = repository.findById(-100L);
         assertThat(fromDb).isEmpty();
-
-        entityManager.clear();
     }
 
     @Test
     void getAllProductsTest() {
-        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
-
-        Product test1 = new Product("Amogi Pen", "", user);
-        Product test2 = new Product("AmogusPen", "", user);
-        Product test3 = new Product("Charger 3", "", user);
 
         entityManager.persist(user);
         entityManager.persist(test1);
@@ -73,24 +85,10 @@ class ProductRepositoryTest {
                 tuple(test2.getProductId(), test2.getProductName()),
                 tuple(test3.getProductId(), test3.getProductName())
             );
-
-        entityManager.clear();
     }
 
     @Test
-    void findProductsContainingName(){
-        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
-
-        Product test1 = new Product("Amogi Pen", "", user);
-        Product test2 = new Product("Charger 3", "", user);
-        Product test3 = new Product("AmogusPen", "", user);
-
-        entityManager.persist(user);
-        entityManager.persist(test1);
-        entityManager.persist(test2);
-        entityManager.persist(test3);
-        entityManager.flush();
-
+    void findByProductNameIgnoreCaseContaining() {
 
         List<Product> allProducts= repository.findByProductNameIgnoreCaseContaining("Am");
 
@@ -101,9 +99,39 @@ class ProductRepositoryTest {
                 tuple(test1.getProductId(), test1.getProductName()),
                 tuple(test3.getProductId(), test3.getProductName())
             );
-
-        entityManager.clear();
     }
     
+
+    @Test
+    void findByCategoryContains() {
+
+        List<Product> products = repository.findByCategoryContains("USB");
+
+        assertThat(products)
+            .hasSize(2)
+            .extracting(Product::getProductId, Product::getProductName)
+            .containsOnly(
+                tuple(test1.getProductId(), test1.getProductName()),
+                tuple(test3.getProductId(), test3.getProductName())
+            );
+
+    }
+
+    @Test
+    void findByProductNameContainsAndCategoryContains(){
+
+        List<Product> products = repository.findByProductNameContainsAndCategoryContains("Amogi", "USB");
+
+        assertThat(products)
+            .hasSize(1)
+            .extracting(Product::getProductId, Product::getProductName)
+            .containsOnly(
+                tuple(test1.getProductId(), test1.getProductName())
+            );
+
+
+    }
+
+
 
 }
