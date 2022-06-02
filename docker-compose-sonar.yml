@@ -52,7 +52,7 @@ services:
       zap_db:
         condition: service_healthy
 
-    command: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=TQS-G11_Zap_Backend -Dsonar.organization=tqs-g11 -Dsonar.verbose=true  -e -X
+    command: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=TQS-G11_Zap_Backend -Dsonar.organization=tqs-g11 -Dsonar.verbose=true  -e -X -Dsonar.login=${{ secrets.SONAR_TOKEN }}
     environment:
       - spring.datasource.url=jdbc:mysql://zap_db:3306/mysql
       - spring.datasource.username=root
