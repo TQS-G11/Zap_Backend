@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -22,32 +24,44 @@ class CartRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
+    private User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
+
+    private Product p1 = new Product("Amogi Pen", "", user);
+    private Product p2 = new Product("USB Cable", "", user);
+    private Product p3 = new Product("Charger 3", "", user);
+
+    private CartProduct cp1 = new CartProduct(p1, 1, user);
+    private CartProduct cp2 = new CartProduct(p2, 3, user);
+    private CartProduct cp3 = new CartProduct(p3, 3, user);
+
     @Autowired
     private CartRepository repository;
 
-    @Test
-    void findByUserIdTest(){
+    @BeforeEach
+    void setUp(){
 
-        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
+        p1.setCategory("USB");            
+        p2.setCategory("Charger");        
+        p3.setCategory("USB");            
 
         entityManager.persist(user);
-
-        Product p1 = new Product("Amogi Pen", "", user);
-        Product p2 = new Product("USB Cable", "", user);
-        Product p3 = new Product("Charger 3", "", user);
-
         entityManager.persist(p1);
         entityManager.persist(p2);
         entityManager.persist(p3);
-
-        CartProduct cp1 = new CartProduct(p1, 1, user);
-        CartProduct cp2 = new CartProduct(p2, 3, user);
-        CartProduct cp3 = new CartProduct(p3, 3, user);
-
         entityManager.persist(cp1);
         entityManager.persist(cp2);
         entityManager.persist(cp3);
         entityManager.flush();
+    }
+    
+    @AfterEach
+    void clear(){
+        entityManager.clear();
+    }
+      
+
+    @Test
+    void findByUserIdTest(){
 
         List<CartProduct> cart = repository.findByUserId(user.getId());
 
@@ -66,17 +80,6 @@ class CartRepositoryTest {
 
     @Test
     void findById(){
-
-        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
-
-        Product p1 = new Product("Amogi Pen", "", user);
-        CartProduct cp1 = new CartProduct(p1, 1, user);
-
-        entityManager.persist(user);
-        entityManager.persist(p1);
-
-        entityManager.persist(cp1);
-        entityManager.flush();
         Optional<CartProduct> cart1 = repository.findById(cp1.getId());
 
         assertThat(cart1)
