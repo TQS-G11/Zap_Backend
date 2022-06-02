@@ -63,6 +63,7 @@ services:
       - sonar.organization=tqs-g11
       - sonar.login=$${{ secrets.SONAR_TOKEN }}
       - sonar.projectName=Zap_Backend
+      - sonar.verbose=true
     healthcheck:
       test: "curl --fail --silent localhost:8080/actuator/health | grep UP || exit 1"
       interval: 20s
