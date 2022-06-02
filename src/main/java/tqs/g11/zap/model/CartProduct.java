@@ -33,6 +33,13 @@ public class CartProduct {
     @ManyToOne
     private User user;
 
+    public CartProduct(Product product, Integer quantity, User user){
+        this.product = product;        
+        this.quantity = quantity;        
+        this.user = user;            
+    }
+
+
     @Override
     public String toString() {
         return "CartProduct{" +
