@@ -61,7 +61,7 @@ services:
       - spring.jpa.hibernate.ddl-auto=update
       - sonar.projectKey=TQS-G11_Zap_Backend
       - sonar.organization=tqs-g11
-      - sonar.login=${{ secrets.SONAR_TOKEN }}
+      - sonar.login=$${{ secrets.SONAR_TOKEN }}
     healthcheck:
       test: "curl --fail --silent localhost:8080/actuator/health | grep UP || exit 1"
       interval: 20s
