@@ -7,10 +7,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tqs.g11.zap.enums.UserRoles;
+import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.model.User;
+import tqs.g11.zap.repository.CartRepository;
 import tqs.g11.zap.repository.ProductRepository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -25,28 +28,52 @@ public class ServiceWithMockRepositoryTest {
     @Mock(lenient = true)
     private ProductRepository productRepository;
 
+    @Mock(lenient = true)
+    private CartRepository cartRepository;
+
     @InjectMocks
     private ProductService productService;
 
-    @Mock
-    private UsersService usersService;
+    @InjectMocks
+    private CartService cartService;
+
+//    @Mock
+//    private UsersService usersService;
 
     @BeforeEach
 //    @WithMockUser(username = "sussycosta", roles = {"CLIENT"})
     void setUp() {
-        User user = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
 //        when(usersService.getAuthUser(any())).thenReturn(mockUser);
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        User user = usersService.getAuthUser((UserDetails) authentication.getPrincipal());
-        Product p1 = new Product(1L, "Among Us Pen Drive", "url1", "An Among Us pen drive", 69, user, 420.69, "Pen Drive");
-        Product p2 = new Product(2L, "Notebook super charger", "url2", "A notebook charger", 40, user, 69.0, "Charger");
-        Product p3 = new Product(3L, "Cellphone super charger", "url3", "An Among Us pen drive", 13, user, 23.4, "Charger");
+
+        User user1 = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
+        User user2 = new User("user2", "Deinis Lie", "sussybot564", UserRoles.CLIENT);
+        User user3 = new User("user3", "Licius Vinicious", "edinaldus", UserRoles.CLIENT);
+
+        Product p1 = new Product(1L, "Among Us Pen Drive", "url1", "An Among Us pen drive", 69, user1, 420.69, "Pen Drive");
+        Product p2 = new Product(2L, "Notebook super charger", "url2", "A notebook charger", 40, user1, 69.0, "Charger");
+        Product p3 = new Product(3L, "Cellphone super charger", "url3", "An Among Us pen drive", 13, user1, 23.4, "Charger");
+
+        CartProduct cp1 = new CartProduct(1L, p1, 1, user2);
+        CartProduct cp2 = new CartProduct(2L, p3, 3, user2);
+
+        List<CartProduct> cpsUser2 = new ArrayList<>(Arrays.asList(cp1, cp2));
+
+        CartProduct cp3 = new CartProduct(3L, p1, 1, user3);
+        CartProduct cp4 = new CartProduct(4L, p2, 2, user3);
+        CartProduct cp5 = new CartProduct(5L, p3, 1, user3);
+
+        List<CartProduct> cpsUser3 = new ArrayList<>(Arrays.asList(cp3, cp4, cp5));
 
         when(productRepository.findByProductNameIgnoreCaseContaining("Among")).thenReturn(List.of(p1));
         when(productRepository.getProductByProductId(2L)).thenReturn(Optional.of(p2));
         when(productRepository.findByCategoryContains("Charger")).thenReturn(Arrays.asList(p2, p3));
         when(productRepository.findByProductNameContainsAndCategoryContains("Cellphone", "Charger")).thenReturn(List.of(p3));
         when(productRepository.findAll()).thenReturn(Arrays.asList(p1, p2, p3));
+
+        when(cartRepository.findByUserId(2L)).thenReturn(cpsUser2);
+        when(cartRepository.findByUserId(3L)).thenReturn(cpsUser3);
     }
 
     @Test
@@ -91,5 +118,24 @@ public class ServiceWithMockRepositoryTest {
         assertThat(products).hasSize(1);
         assertThat(products.get(0).getProductName()).isEqualTo("Cellphone super charger");
     }
+
+    @Test
+    void getCartProductByUserId() {
+        List<CartProduct> cartProducts = cartService.getCartsByUserId(2L);
+        assertThat(cartProducts).hasSize(2);
+
+        cartProducts = cartService.getCartsByUserId(3L);
+        assertThat(cartProducts).hasSize(3);
+    }
+
+    @Test
+    void deleteCartProductByUserId() {
+        List<CartProduct> cartProducts = cartService.deleteCartsByUserId(2L);
+        assertThat(cartProducts).hasSize(2);
+
+        cartProducts = cartService.deleteCartsByUserId(3L);
+        assertThat(cartProducts).hasSize(3);
+    }
+
 
 }
