@@ -34,4 +34,10 @@ public class RESTController {
         return ResponseEntity.ok().body(data.get());
     } 
 
+    @GetMapping("/carts/user/{user_id}/checkout")
+    public ResponseEntity<String> checkoutCart(@PathVariable("id") Long id){
+
+        return null;
+    }
+
 }
