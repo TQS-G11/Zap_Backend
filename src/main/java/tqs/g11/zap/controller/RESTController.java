@@ -51,10 +51,13 @@ public class RESTController {
     }
 
 
-    @GetMapping("/carts/user/{user_id}/checkout")
+    @GetMapping("/carts/user/{id}/checkout")
     public ResponseEntity<String> checkoutCart(@PathVariable("id") Long id){
-
-        return null;
+        if(cartService.checkoutCart(id)){
+            return ResponseEntity.ok().body("Checkout Successful");
+        }
+        else{
+            return ResponseEntity.internalServerError().body("Error: Could Not Find Driver");
+        }
     }
-
 }

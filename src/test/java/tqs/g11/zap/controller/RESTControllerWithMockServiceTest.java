@@ -62,8 +62,8 @@ class RESTControllerWithServiceMockTest {
     void setup() {
 
         Product p1 = new Product(1L, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user1, 15.5, "Pen Drive");
-        Product p2 = new Product(2L, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, user1, 3.0, "Cable");
-        Product p3 = new Product(3L, "Charger 3", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 10, user1, 1000.0, "Charger");
+        Product p2 = new Product(2L, "Charger 3", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, user1, 3.0, "Cable");
+        Product p3 = new Product(3L, "AmogusPen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 10, user1, 1000.0, "Charger");
 
         CartProduct cp1 = new CartProduct(1L, p1, 1, user2);
         CartProduct cp2 = new CartProduct(2L, p3, 3, user2);
