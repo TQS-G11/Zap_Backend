@@ -101,9 +101,9 @@ class RESTControllerWithServiceMockTest {
             .andExpect(jsonPath("$", hasSize(3)))
             .andExpect(jsonPath("$[0].productName", is("Amogi Pen")))
             .andExpect(jsonPath("$[0].owner.username", is(user1.getUsername())))
-            .andExpect(jsonPath("$[1].productName", is("Charger 3")))
+            .andExpect(jsonPath("$[1].productName", is("USB Cable")))
             .andExpect(jsonPath("$[1].owner.username", is(user1.getUsername())))
-            .andExpect(jsonPath("$[2].productName", is("AmogusPen")))
+            .andExpect(jsonPath("$[2].productName", is("Charger 3")))
             .andExpect(jsonPath("$[2].owner.username", is(user1.getUsername())));
     }
 
