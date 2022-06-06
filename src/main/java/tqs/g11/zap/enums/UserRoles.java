@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 public enum UserRoles {
     MANAGER("MANAGER"),
-    RIDER("CLIENT");
+    CLIENT("CLIENT");
 
     private final String role;
 

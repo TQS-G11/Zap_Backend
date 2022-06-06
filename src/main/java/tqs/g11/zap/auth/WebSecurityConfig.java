@@ -54,7 +54,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/deliveries",
                         "/api/test",
                         "/zap/products",
-                        "/zap/products/{id}")
+                        "/zap/products/{id}",
+                        "/zap/carts/user/{id}")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()

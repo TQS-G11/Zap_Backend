@@ -3,7 +3,6 @@ package tqs.g11.zap.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import tqs.g11.zap.model.Product;
-import tqs.g11.zap.model.User;
 
 import java.util.List;
 import java.util.Optional;
