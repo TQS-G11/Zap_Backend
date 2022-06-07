@@ -79,8 +79,7 @@ class RestControllerIT {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("Checkout Successful");
-        
-
+    
     }
     
 }
