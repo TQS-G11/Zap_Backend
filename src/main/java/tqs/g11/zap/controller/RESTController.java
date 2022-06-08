@@ -4,13 +4,17 @@ import java.util.List;
 import java.util.Optional;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import tqs.g11.zap.dto.CartProductPost;
+import tqs.g11.zap.dto.CartProductRE;
+import tqs.g11.zap.dto.CartProductsRE;
 import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.service.CartService;
@@ -74,5 +78,22 @@ public class RESTController {
         return ResponseEntity.ok().body(cartProducts);
     }
 
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @GetMapping("/cart")
+    public ResponseEntity<List<CartProduct>> getUserCart(Authentication auth) {
+        List<CartProduct> cartProducts = cartService.getClientCart(auth);
+        return ResponseEntity.ok().body(cartProducts);
+    }
 
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @PostMapping("/cart/add")
+    public ResponseEntity<CartProductRE> clientAddCartProduct(Authentication auth, CartProductPost cartProductPost) {
+        return cartService.clientAddCartProduct(auth, cartProductPost);
+    }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @PostMapping("/cart/checkout")
+    public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth) {
+        return cartService.clientCartCheckout(auth);
+    }
 }
