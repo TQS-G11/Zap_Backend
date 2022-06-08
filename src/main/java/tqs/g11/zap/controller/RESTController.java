@@ -15,6 +15,7 @@ import tqs.g11.zap.service.ProductService;
 
 //@CrossOrigin
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/zap")
 public class RESTController {
     
