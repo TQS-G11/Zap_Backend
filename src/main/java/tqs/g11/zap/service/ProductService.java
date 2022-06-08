@@ -33,5 +33,9 @@ public class ProductService {
     public List<Product> getProductsByNameAndCategory(String name, String category) {
         return productRepository.findByProductNameContainsAndCategoryContains(name, category);
     }
+
+    public Product createProduct(Product product) {
+        return null;
+    }
     
 }

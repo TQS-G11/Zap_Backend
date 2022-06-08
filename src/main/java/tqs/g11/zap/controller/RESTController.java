@@ -38,6 +38,13 @@ public class RESTController {
         return ResponseEntity.ok().body(data.get());
     }
 
+    @PostMapping("/products")
+    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+        Product data = productService.createProduct(product);
+        return ResponseEntity.ok().body(data);
+    }
+
+
     @GetMapping("/carts/user/{user_id}")
     public ResponseEntity<List<CartProduct>> getCartsByUserId(@PathVariable("user_id") Long userId) {
         List<CartProduct> cartProducts = cartService.getCartsByUserId(userId);
@@ -49,6 +56,7 @@ public class RESTController {
         List<CartProduct> cartProducts = cartService.deleteCartsByUserId(userId);
         return ResponseEntity.ok().body(cartProducts);
     }
+
 
 
 }
