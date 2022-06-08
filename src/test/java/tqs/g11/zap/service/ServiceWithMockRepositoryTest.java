@@ -20,7 +20,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ServiceWithMockRepositoryTest {
@@ -71,6 +71,7 @@ public class ServiceWithMockRepositoryTest {
         when(productRepository.findByCategoryContains("Charger")).thenReturn(Arrays.asList(p2, p3));
         when(productRepository.findByProductNameContainsAndCategoryContains("Cellphone", "Charger")).thenReturn(List.of(p3));
         when(productRepository.findAll()).thenReturn(Arrays.asList(p1, p2, p3));
+        when(productRepository.save(any())).thenReturn(p1);
 
         when(cartRepository.findByUserId(2L)).thenReturn(cpsUser2);
         when(cartRepository.findByUserId(3L)).thenReturn(cpsUser3);
@@ -117,6 +118,16 @@ public class ServiceWithMockRepositoryTest {
 
         assertThat(products).hasSize(1);
         assertThat(products.get(0).getProductName()).isEqualTo("Cellphone super charger");
+    }
+
+    @Test
+    void createProduct() {
+        User user1 = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
+        Product p1 = new Product(1L, "Among Us Pen Drive", "url1", "An Among Us pen drive", 69, user1, 420.69, "Pen Drive");
+
+        Product output = productService.createProduct(p1);
+
+        assertThat(output.getProductName()).isEqualTo("Among Us Pen Drive");
     }
 
     @Test
