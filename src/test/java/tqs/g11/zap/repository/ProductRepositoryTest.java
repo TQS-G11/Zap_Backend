@@ -79,25 +79,25 @@ class ProductRepositoryTest {
 
         assertThat(allProducts)
             .hasSize(3)
-            .extracting(Product::getProductId, Product::getProductName)
+            .extracting(Product::getProductId, Product::getName)
             .containsOnly(
-                tuple(test1.getProductId(), test1.getProductName()),
-                tuple(test2.getProductId(), test2.getProductName()),
-                tuple(test3.getProductId(), test3.getProductName())
+                tuple(test1.getProductId(), test1.getName()),
+                tuple(test2.getProductId(), test2.getName()),
+                tuple(test3.getProductId(), test3.getName())
             );
     }
 
     @Test
     void findByProductNameIgnoreCaseContaining() {
 
-        List<Product> allProducts= repository.findByProductNameIgnoreCaseContaining("Am");
+        List<Product> allProducts= repository.findByNameIgnoreCaseContaining("Am");
 
         assertThat(allProducts)
             .hasSize(2)
-            .extracting(Product::getProductId, Product::getProductName)
+            .extracting(Product::getProductId, Product::getName)
             .containsOnly(
-                tuple(test1.getProductId(), test1.getProductName()),
-                tuple(test3.getProductId(), test3.getProductName())
+                tuple(test1.getProductId(), test1.getName()),
+                tuple(test3.getProductId(), test3.getName())
             );
     }
     
@@ -109,10 +109,10 @@ class ProductRepositoryTest {
 
         assertThat(products)
             .hasSize(2)
-            .extracting(Product::getProductId, Product::getProductName)
+            .extracting(Product::getProductId, Product::getName)
             .containsOnly(
-                tuple(test1.getProductId(), test1.getProductName()),
-                tuple(test3.getProductId(), test3.getProductName())
+                tuple(test1.getProductId(), test1.getName()),
+                tuple(test3.getProductId(), test3.getName())
             );
 
     }
@@ -120,13 +120,13 @@ class ProductRepositoryTest {
     @Test
     void findByProductNameContainsAndCategoryContains(){
 
-        List<Product> products = repository.findByProductNameContainsAndCategoryContains("Amogi", "USB");
+        List<Product> products = repository.findByNameContainsAndCategoryContains("Amogi", "USB");
 
         assertThat(products)
             .hasSize(1)
-            .extracting(Product::getProductId, Product::getProductName)
+            .extracting(Product::getProductId, Product::getName)
             .containsOnly(
-                tuple(test1.getProductId(), test1.getProductName())
+                tuple(test1.getProductId(), test1.getName())
             );
 
 

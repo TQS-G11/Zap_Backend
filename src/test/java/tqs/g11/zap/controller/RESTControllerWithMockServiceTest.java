@@ -84,7 +84,7 @@ class RESTControllerWithServiceMockTest {
 
         when(productService.getProducts()).thenReturn(products);
         when(productService.getProductById(1L)).thenReturn(Optional.of(p1));
-        when(productService.createProduct(any())).thenReturn(p1);
+        when(productService.createProduct(any(),any())).thenReturn(p1);
 
         System.out.println("sussy cpsUser2");
         System.out.println(cpsUser2);
@@ -159,9 +159,11 @@ class RESTControllerWithServiceMockTest {
         Product p1 = new Product(1L, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user1, 15.5, "Pen Drive");
 
         String content = objectMapper.writeValueAsString(p1);
+        System.out.println("Content");
+        System.out.println(content);
         mvc.perform(post("/zap/products").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.productName", is("Amogi Pen")))
+                .andExpect(jsonPath("$.name", is("Amogi Pen")))
                 .andExpect(jsonPath("$.owner.username", is(user1.getUsername())));
     }
 }

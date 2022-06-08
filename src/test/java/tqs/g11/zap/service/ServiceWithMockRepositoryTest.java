@@ -6,6 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import tqs.g11.zap.enums.UserRoles;
 import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
@@ -13,10 +16,7 @@ import tqs.g11.zap.model.User;
 import tqs.g11.zap.repository.CartRepository;
 import tqs.g11.zap.repository.ProductRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,16 +37,19 @@ public class ServiceWithMockRepositoryTest {
     @InjectMocks
     private CartService cartService;
 
+    @Mock(lenient = true)
+    private UsersService usersService;
+
+    private User manager;
+
 //    @Mock
 //    private UsersService usersService;
 
     @BeforeEach
 //    @WithMockUser(username = "sussycosta", roles = {"CLIENT"})
     void setUp() {
-//        when(usersService.getAuthUser(any())).thenReturn(mockUser);
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user = usersService.getAuthUser((UserDetails) authentication.getPrincipal());
 
+        manager = new User("caio_costela", "Caio Costela", "amogus123", UserRoles.MANAGER);
         User user1 = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
         User user2 = new User("user2", "Deinis Lie", "sussybot564", UserRoles.CLIENT);
         User user3 = new User("user3", "Licius Vinicious", "edinaldus", UserRoles.CLIENT);
@@ -66,10 +69,10 @@ public class ServiceWithMockRepositoryTest {
 
         List<CartProduct> cpsUser3 = new ArrayList<>(Arrays.asList(cp3, cp4, cp5));
 
-        when(productRepository.findByProductNameIgnoreCaseContaining("Among")).thenReturn(List.of(p1));
+        when(productRepository.findByNameIgnoreCaseContaining("Among")).thenReturn(List.of(p1));
         when(productRepository.getProductByProductId(2L)).thenReturn(Optional.of(p2));
         when(productRepository.findByCategoryContains("Charger")).thenReturn(Arrays.asList(p2, p3));
-        when(productRepository.findByProductNameContainsAndCategoryContains("Cellphone", "Charger")).thenReturn(List.of(p3));
+        when(productRepository.findByNameContainsAndCategoryContains("Cellphone", "Charger")).thenReturn(List.of(p3));
         when(productRepository.findAll()).thenReturn(Arrays.asList(p1, p2, p3));
         when(productRepository.save(any())).thenReturn(p1);
 
@@ -82,7 +85,7 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProducts();
 
         assertThat(products).hasSize(3);
-        assertThat(products.get(0).getProductName()).isEqualTo("Among Us Pen Drive");
+        assertThat(products.get(0).getName()).isEqualTo("Among Us Pen Drive");
     }
 
     @Test
@@ -90,7 +93,7 @@ public class ServiceWithMockRepositoryTest {
         Optional<Product> product = productService.getProductById(2L);
 
         assertThat(product.isEmpty()).isFalse();
-        assertThat(product.get().getProductName()).isEqualTo("Notebook super charger");
+        assertThat(product.get().getName()).isEqualTo("Notebook super charger");
 
     }
 
@@ -99,7 +102,7 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProductsByName("Among");
 
         assertThat(products).hasSize(1);
-        assertThat(products.get(0).getProductName()).isEqualTo("Among Us Pen Drive");
+        assertThat(products.get(0).getName()).isEqualTo("Among Us Pen Drive");
     }
 
     @Test
@@ -107,8 +110,8 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProductsByCategory("Charger");
 
         assertThat(products).hasSize(2);
-        assertThat(products.get(0).getProductName()).isEqualTo("Notebook super charger");
-        assertThat(products.get(1).getProductName()).isEqualTo("Cellphone super charger");
+        assertThat(products.get(0).getName()).isEqualTo("Notebook super charger");
+        assertThat(products.get(1).getName()).isEqualTo("Cellphone super charger");
 
     }
 
@@ -117,17 +120,20 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProductsByNameAndCategory("Cellphone", "Charger");
 
         assertThat(products).hasSize(1);
-        assertThat(products.get(0).getProductName()).isEqualTo("Cellphone super charger");
+        assertThat(products.get(0).getName()).isEqualTo("Cellphone super charger");
     }
 
     @Test
     void createProduct() {
-        User user1 = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
-        Product p1 = new Product(1L, "Among Us Pen Drive", "url1", "An Among Us pen drive", 69, user1, 420.69, "Pen Drive");
 
-        Product output = productService.createProduct(p1);
+        Authentication auth = setUpUserMockAuth(manager);
 
-        assertThat(output.getProductName()).isEqualTo("Among Us Pen Drive");
+        Product p1 = new Product(1L, "Among Us Pen Drive", "url1", "An Among Us pen drive", 69, null, 420.69, "Pen Drive");
+
+        Product output = productService.createProduct(auth,p1);
+
+        assertThat(output.getName()).isEqualTo("Among Us Pen Drive");
+        assertThat(output.getOwner().getName()).isEqualTo("Caio Costela");
     }
 
     @Test
@@ -146,6 +152,18 @@ public class ServiceWithMockRepositoryTest {
 
         cartProducts = cartService.deleteCartsByUserId(3L);
         assertThat(cartProducts).hasSize(3);
+    }
+
+    private Authentication setUpUserMockAuth(User user) {
+        Authentication auth = mock(Authentication.class);
+        Set<SimpleGrantedAuthority> authorities = Collections.singleton(
+                new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getUsername(), user.getPassword(), authorities
+        );
+        when(auth.getPrincipal()).thenReturn(userDetails);
+        when(usersService.getAuthUser(userDetails)).thenReturn(user);
+        return auth;
     }
 
 

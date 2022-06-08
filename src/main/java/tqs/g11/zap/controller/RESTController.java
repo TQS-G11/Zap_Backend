@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import tqs.g11.zap.model.CartProduct;
@@ -39,8 +40,8 @@ public class RESTController {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        Product data = productService.createProduct(product);
+    public ResponseEntity<Product> createProduct(Authentication auth, @RequestBody Product product) {
+        Product data = productService.createProduct(auth, product);
         return ResponseEntity.ok().body(data);
     }
 
