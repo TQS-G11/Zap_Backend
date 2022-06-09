@@ -21,15 +21,15 @@ jobs:
 
       - name: Build with Maven
         run: docker-compose -f "docker-compose-deploy.yml" up --build  --exit-code-from zap_app
-      - name: Debug
-        run: ls ./.docker-volumes/ -la
+      #- name: Debug
+      #  run: ls ./.docker-volumes/ -la
         #run: rm -rf ./.docker-volumes
         #  run: mvn clean install
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: java-app
-          path: './.docker-volumes/zap_app/target/*.war'
+          path: './.docker-volumes/zap/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -51,4 +51,4 @@ jobs:
           app-name: 'ZapBackend'
           slot-name: 'production'
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_f86023b86c5d4a86849ff58ba65785d8 }}
-          package: '*.war'
+          package: '*.jar'
