@@ -40,10 +40,10 @@ jobs:
     
     steps:
       - uses: azure/webapps-deploy@v2
+      - name: Login via Az module
+        uses: azure/login@v1
         with:
-         publish-profile: ${{ secrets.AzureAppService_PublishProfile_f86023b86c5d4a86849ff58ba65785d8 }}
-      - uses: azure/login@v1
-        
+            creds: ${{secrets.AZURE_CREDENTIALS}}
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
