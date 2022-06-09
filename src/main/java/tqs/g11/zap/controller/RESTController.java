@@ -4,20 +4,24 @@ import java.util.List;
 import java.util.Optional;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import tqs.g11.zap.dto.CartProductPost;
+import tqs.g11.zap.dto.CartProductRE;
+import tqs.g11.zap.dto.CartProductsRE;
 import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.service.CartService;
 import tqs.g11.zap.service.ProductService;
 
-//@CrossOrigin
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/zap")
 public class RESTController {
     
@@ -50,6 +54,13 @@ public class RESTController {
         return ResponseEntity.ok().body(data.get());
     }
 
+    @PostMapping("/products")
+    public ResponseEntity<Product> createProduct(Authentication auth, @RequestBody Product product) {
+        Product data = productService.createProduct(auth, product);
+        return ResponseEntity.ok().body(data);
+    }
+
+
     @Operation(summary = "Fetch the cart of a specific User")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Cart Found"),
@@ -74,5 +85,33 @@ public class RESTController {
         return ResponseEntity.ok().body(cartProducts);
     }
 
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @GetMapping("/cart")
+    public ResponseEntity<List<CartProduct>> getUserCart(Authentication auth) {
+        List<CartProduct> cartProducts = cartService.getClientCart(auth);
+        return ResponseEntity.ok().body(cartProducts);
+    }
 
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @PostMapping("/cart/add")
+    public ResponseEntity<CartProductRE> clientAddCartProduct(Authentication auth, @RequestBody CartProductPost cartProductPost) {
+        return cartService.clientAddCartProduct(auth, cartProductPost);
+    }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @PostMapping("/cart/checkout")
+    public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth) {
+        return cartService.clientCartCheckout(auth);
+    }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @DeleteMapping("/cart/{cart_id}")
+    public ResponseEntity<CartProductRE> clientDeleteCart(Authentication auth, @PathVariable("cart_id") Long cartId) {
+        return cartService.deleteCartById(auth, cartId);
+    }
+
+    @GetMapping("/carts/user/{user_id}/checkout")
+    public ResponseEntity<String> checkoutCart(@PathVariable("id") Long id){
+        return null;
+    }
 }

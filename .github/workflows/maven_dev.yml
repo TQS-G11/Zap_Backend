@@ -26,5 +26,6 @@ jobs:
       run: docker-compose -f "docker_compose_test.yml" up --build  --exit-code-from zap_app
     - name: Stop containers
       if: always()
-      run: docker-compose -f "docker_compose_test.yml" down
+      run: docker-compose  -f "docker_compose_test.yml" down
+
    

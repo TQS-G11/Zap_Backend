@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.CoreMatchers.is;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import tqs.g11.zap.auth.TokenProvider;
 import tqs.g11.zap.auth.UnauthorizedEntryPoint;
 import tqs.g11.zap.enums.UserRoles;
@@ -54,6 +56,8 @@ class RESTControllerWithServiceMockTest {
     @MockBean
     private TokenProvider t;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     private User user1 = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
     private User user2 = new User("user2", "Deinis Lie", "sussybot564", UserRoles.CLIENT);
     private User user3 = new User("user3", "Licius Vinicious", "edinaldus", UserRoles.CLIENT);
@@ -80,15 +84,12 @@ class RESTControllerWithServiceMockTest {
 
         when(productService.getProducts()).thenReturn(products);
         when(productService.getProductById(1L)).thenReturn(Optional.of(p1));
+        when(productService.createProduct(any(),any())).thenReturn(p1);
 
-        System.out.println("sussy cpsUser2");
-        System.out.println(cpsUser2);
         when(cartService.getCartsByUserId(2L)).thenReturn(cpsUser2);
         when(cartService.getCartsByUserId(3L)).thenReturn(cpsUser3);
         when(cartService.deleteCartsByUserId(2L)).thenReturn(cpsUser2);
         when(cartService.deleteCartsByUserId(3L)).thenReturn(cpsUser3);
-
-
 
     }
 
@@ -99,11 +100,11 @@ class RESTControllerWithServiceMockTest {
             get("/zap/products").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(3)))
-            .andExpect(jsonPath("$[0].productName", is("Amogi Pen")))
+            .andExpect(jsonPath("$[0].name", is("Amogi Pen")))
             .andExpect(jsonPath("$[0].owner.username", is(user1.getUsername())))
-            .andExpect(jsonPath("$[1].productName", is("USB Cable")))
+            .andExpect(jsonPath("$[1].name", is("USB Cable")))
             .andExpect(jsonPath("$[1].owner.username", is(user1.getUsername())))
-            .andExpect(jsonPath("$[2].productName", is("Charger 3")))
+            .andExpect(jsonPath("$[2].name", is("Charger 3")))
             .andExpect(jsonPath("$[2].owner.username", is(user1.getUsername())));
     }
 
@@ -114,7 +115,7 @@ class RESTControllerWithServiceMockTest {
         mvc.perform(
             get("/zap/products/1").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.productName", is("Amogi Pen")))
+            .andExpect(jsonPath("$.name", is("Amogi Pen")))
             .andExpect(jsonPath("$.owner.username", is(user1.getUsername())));
     }
 
@@ -149,5 +150,18 @@ class RESTControllerWithServiceMockTest {
                 .andExpect(jsonPath("$[0].quantity", is(1)))
                 .andExpect(jsonPath("$[1].quantity", is(2)))
                 .andExpect(jsonPath("$[2].quantity", is(1)));
+    }
+
+    @Test
+    void createProduct() throws Exception {
+        Product p1 = new Product(1L, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user1, 15.5, "Pen Drive");
+
+        String content = objectMapper.writeValueAsString(p1);
+        System.out.println("Content");
+        System.out.println(content);
+        mvc.perform(post("/zap/products").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("Amogi Pen")))
+                .andExpect(jsonPath("$.owner.username", is(user1.getUsername())));
     }
 }

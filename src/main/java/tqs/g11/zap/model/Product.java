@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "app_products")
@@ -22,7 +21,7 @@ public class Product {
 
     @Getter
     @Setter
-    private String productName;
+    private String name;
 
     @Getter
     @Setter
@@ -46,7 +45,7 @@ public class Product {
     private Double price;
 
     public Product(String name, String description, User owner){
-        this.productName = name;
+        this.name = name;
         this.description = description;
         this.owner = owner;
         this.price = 0.0;
@@ -65,7 +64,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product [description=" + description + ", id=" + productId + ", img=" + img + ", name=" + productName + ", owner="
+        return "Product [description=" + description + ", id=" + productId + ", img=" + img + ", name=" + name + ", owner="
                 + owner.getUsername() + ", price=" + price + ", quantity=" + quantity + ", category=" + category + "]";
     }
 }

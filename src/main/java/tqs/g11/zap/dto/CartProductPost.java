@@ -8,12 +8,12 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginUser {
+public class CartProductPost {
     @Getter
     @Setter
-    private String username;
+    private Long productId;
 
     @Getter
     @Setter
-    private String password;
+    private Integer quantity;
 }
