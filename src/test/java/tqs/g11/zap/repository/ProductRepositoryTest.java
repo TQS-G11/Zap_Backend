@@ -20,7 +20,6 @@ import tqs.g11.zap.model.User;
 
 @DataJpaTest
 class ProductRepositoryTest {
-
     @Autowired
     private TestEntityManager entityManager;
 
@@ -35,11 +34,11 @@ class ProductRepositoryTest {
 
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
 
-        test1.setCategory("USB");            
-        test2.setCategory("Charger");        
-        test3.setCategory("USB");            
+        test1.setCategory("USB");
+        test2.setCategory("Charger");
+        test3.setCategory("USB");
 
         entityManager.persist(user);
         entityManager.persist(test1);
@@ -47,9 +46,9 @@ class ProductRepositoryTest {
         entityManager.persist(test3);
         entityManager.flush();
     }
-    
+
     @AfterEach
-    void clear(){
+    void clear() {
         entityManager.clear();
     }
 
@@ -57,7 +56,7 @@ class ProductRepositoryTest {
     void getProductByIdTest() {
         // test if product exists
         Product found = repository.findById(test1.getProductId()).orElse(null);
-        assertThat( found ).isEqualTo(test1);
+        assertThat(found).isEqualTo(test1);
 
         // test that the product doesn't exist
         Optional<Product> fromDb = repository.findById(-100L);
@@ -66,72 +65,61 @@ class ProductRepositoryTest {
 
     @Test
     void getAllProductsTest() {
-
         entityManager.persist(user);
         entityManager.persist(test1);
         entityManager.persist(test2);
         entityManager.persist(test3);
         entityManager.flush();
- 
 
-         List<Product> allProducts= repository.findAll();
-          
+        List<Product> allProducts = repository.findAll();
 
         assertThat(allProducts)
-            .hasSize(3)
-            .extracting(Product::getProductId, Product::getName)
-            .containsOnly(
-                tuple(test1.getProductId(), test1.getName()),
-                tuple(test2.getProductId(), test2.getName()),
-                tuple(test3.getProductId(), test3.getName())
-            );
+                .hasSize(3)
+                .extracting(Product::getProductId, Product::getName)
+                .containsOnly(
+                        tuple(test1.getProductId(), test1.getName()),
+                        tuple(test2.getProductId(), test2.getName()),
+                        tuple(test3.getProductId(), test3.getName())
+                );
     }
 
     @Test
     void findByProductNameIgnoreCaseContaining() {
-
-        List<Product> allProducts= repository.findByNameIgnoreCaseContaining("Am");
+        List<Product> allProducts = repository.findByNameIgnoreCaseContaining("Am");
 
         assertThat(allProducts)
-            .hasSize(2)
-            .extracting(Product::getProductId, Product::getName)
-            .containsOnly(
-                tuple(test1.getProductId(), test1.getName()),
-                tuple(test3.getProductId(), test3.getName())
-            );
+                .hasSize(2)
+                .extracting(Product::getProductId, Product::getName)
+                .containsOnly(
+                        tuple(test1.getProductId(), test1.getName()),
+                        tuple(test3.getProductId(), test3.getName())
+                );
     }
-    
+
 
     @Test
     void findByCategoryContains() {
-
         List<Product> products = repository.findByCategoryContains("USB");
 
         assertThat(products)
-            .hasSize(2)
-            .extracting(Product::getProductId, Product::getName)
-            .containsOnly(
-                tuple(test1.getProductId(), test1.getName()),
-                tuple(test3.getProductId(), test3.getName())
-            );
+                .hasSize(2)
+                .extracting(Product::getProductId, Product::getName)
+                .containsOnly(
+                        tuple(test1.getProductId(), test1.getName()),
+                        tuple(test3.getProductId(), test3.getName())
+                );
 
     }
 
     @Test
-    void findByProductNameContainsAndCategoryContains(){
-
+    void findByProductNameContainsAndCategoryContains() {
         List<Product> products = repository.findByNameContainsAndCategoryContains("Amogi", "USB");
 
         assertThat(products)
-            .hasSize(1)
-            .extracting(Product::getProductId, Product::getName)
-            .containsOnly(
-                tuple(test1.getProductId(), test1.getName())
-            );
-
-
+                .hasSize(1)
+                .extracting(Product::getProductId, Product::getName)
+                .containsOnly(
+                        tuple(test1.getProductId(), test1.getName())
+                );
     }
-
-
-
 }

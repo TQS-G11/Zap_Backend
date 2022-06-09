@@ -20,7 +20,6 @@ import tqs.g11.zap.model.Product;
 import tqs.g11.zap.service.CartService;
 import tqs.g11.zap.service.ProductService;
 
-//@CrossOrigin
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/zap")
@@ -109,5 +108,10 @@ public class RESTController {
     @DeleteMapping("/cart/{cart_id}")
     public ResponseEntity<CartProductRE> clientDeleteCart(Authentication auth, @PathVariable("cart_id") Long cartId) {
         return cartService.deleteCartById(auth, cartId);
+    }
+
+    @GetMapping("/carts/user/{user_id}/checkout")
+    public ResponseEntity<String> checkoutCart(@PathVariable("id") Long id){
+        return null;
     }
 }

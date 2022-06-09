@@ -20,7 +20,6 @@ import tqs.g11.zap.model.User;
 
 @DataJpaTest
 class CartRepositoryTest {
-    
     @Autowired
     private TestEntityManager entityManager;
 
@@ -38,11 +37,11 @@ class CartRepositoryTest {
     private CartRepository repository;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
 
-        p1.setCategory("USB");            
-        p2.setCategory("Charger");        
-        p3.setCategory("USB");            
+        p1.setCategory("USB");
+        p2.setCategory("Charger");
+        p3.setCategory("USB");
 
         entityManager.persist(user);
         entityManager.persist(p1);
@@ -53,44 +52,43 @@ class CartRepositoryTest {
         entityManager.persist(cp3);
         entityManager.flush();
     }
-    
+
     @AfterEach
-    void clear(){
+    void clear() {
         entityManager.clear();
     }
-      
+
 
     @Test
-    void findByUserIdTest(){
+    void findByUserIdTest() {
 
         List<CartProduct> cart = repository.findByUserId(user.getId());
 
         assertThat(cart)
-            .hasSize(3)
-            .extracting(CartProduct::getId, CartProduct::getUser, CartProduct::getProduct)
-            .containsOnly(
-                tuple(cp1.getId(), user, p1),
-                tuple(cp2.getId(), user, p2),
-                tuple(cp3.getId(), user, p3)
-            );
+                .hasSize(3)
+                .extracting(CartProduct::getId, CartProduct::getUser, CartProduct::getProduct)
+                .containsOnly(
+                        tuple(cp1.getId(), user, p1),
+                        tuple(cp2.getId(), user, p2),
+                        tuple(cp3.getId(), user, p3)
+                );
 
         entityManager.clear();
 
     }
 
     @Test
-    void findById(){
+    void findById() {
         Optional<CartProduct> cart1 = repository.findById(cp1.getId());
 
         assertThat(cart1)
-            .isNotEmpty()
-            .contains(cp1);
+                .isNotEmpty()
+                .contains(cp1);
 
         Optional<CartProduct> cart2 = repository.findById(-1l);
 
         assertThat(cart2)
-            .isEmpty();
+                .isEmpty();
         entityManager.clear();
     }
-
 }

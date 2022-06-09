@@ -103,8 +103,7 @@ public class CartService {
         Optional<CartProduct> cartOpt = getCartById(cartId);
         if (cartOpt.isEmpty()) {
             re.addError(ErrorMsg.CART_PRODUCT_NOT_FOUND.toString());
-        }
-        else {
+        } else {
             CartProduct cart = cartOpt.get();
             if (!cart.getUser().equals(client)) {
                 re.addError(ErrorMsg.WRONG_CLIENT_FOR_CART_PRODUCT.toString());
