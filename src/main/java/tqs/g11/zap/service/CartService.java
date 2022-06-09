@@ -94,7 +94,7 @@ public class CartService {
         if (re.getErrors().isEmpty()) {
             TqsBasicHttpClient httpClient = new TqsBasicHttpClient();
             LoginUser loginUser = new LoginUser(client.getUsername(), client.getPassword());
-            String response = httpClient.doHttpPost()
+//            String response = httpClient.doHttpPost();
         }
 
         return ResponseEntity.badRequest().body(re);
