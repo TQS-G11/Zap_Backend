@@ -5,9 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import tqs.g11.zap.client.TqsBasicHttpClient;
 import tqs.g11.zap.dto.CartProductPost;
 import tqs.g11.zap.dto.CartProductRE;
 import tqs.g11.zap.dto.CartProductsRE;
+import tqs.g11.zap.dto.LoginUser;
 import tqs.g11.zap.enums.ErrorMsg;
 import tqs.g11.zap.enums.UserRoles;
 import tqs.g11.zap.model.CartProduct;
@@ -90,7 +92,9 @@ public class CartService {
         }));
 
         if (re.getErrors().isEmpty()) {
-            // TODO: POST request to Deliverize to create order
+            TqsBasicHttpClient httpClient = new TqsBasicHttpClient();
+            LoginUser loginUser = new LoginUser(client.getUsername(), client.getPassword());
+            String response = httpClient.doHttpPost()
         }
 
         return ResponseEntity.badRequest().body(re);
