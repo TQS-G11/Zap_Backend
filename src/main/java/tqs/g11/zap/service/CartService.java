@@ -1,6 +1,5 @@
 package tqs.g11.zap.service;
 
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -69,6 +68,7 @@ public class CartService {
 
         if (re.getErrors().isEmpty()) {
             CartProduct cartProduct = new CartProduct(product, cartProductPost.getQuantity(), client);
+            cartRepository.save(cartProduct);
             re.setCartProduct(cartProduct);
             return ResponseEntity.status(HttpStatus.CREATED).body(re);
         }
