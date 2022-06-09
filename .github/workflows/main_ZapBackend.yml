@@ -5,8 +5,8 @@ name: Build and deploy WAR app to Azure Web App - ZapBackend
 
 on:
   push:
-    branches: [main,dev]
-     # - main
+    branches: #[main,dev]
+      - main
      # Only for testing, production should have only main
   workflow_dispatch:
 jobs:
