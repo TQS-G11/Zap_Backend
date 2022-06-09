@@ -32,6 +32,8 @@ public class CartService {
         this.productService = productService;
     }
 
+    public Optional<CartProduct> getCartById(Long id) { return cartRepository.findById(id); }
+
     public List<CartProduct> getCartsByUserId(Long id) {
         return cartRepository.findByUserId(id);
     }
@@ -89,6 +91,30 @@ public class CartService {
 
         if (re.getErrors().isEmpty()) {
             // TODO: POST request to Deliverize to create order
+        }
+
+        return ResponseEntity.badRequest().body(re);
+    }
+
+    public ResponseEntity<CartProductRE> deleteCartById(Authentication auth, Long cartId) {
+        CartProductRE re = new CartProductRE();
+        User client = usersService.getAuthUser((UserDetails) auth.getPrincipal());
+        assert client.getRole().equals(UserRoles.CLIENT.toString());
+        Optional<CartProduct> cartOpt = getCartById(cartId);
+        if (cartOpt.isEmpty()) {
+            re.addError(ErrorMsg.CART_PRODUCT_NOT_FOUND.toString());
+        }
+        else {
+            CartProduct cart = cartOpt.get();
+            if (!cart.getUser().equals(client)) {
+                re.addError(ErrorMsg.WRONG_CLIENT_FOR_CART_PRODUCT.toString());
+            }
+
+            if (re.getErrors().isEmpty()) {
+                re.setCartProduct(cart);
+                cartRepository.delete(cart);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(re);
+            }
         }
 
         return ResponseEntity.badRequest().body(re);

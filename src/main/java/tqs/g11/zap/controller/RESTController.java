@@ -104,4 +104,10 @@ public class RESTController {
     public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth) {
         return cartService.clientCartCheckout(auth);
     }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @DeleteMapping("/cart/{cart_id}")
+    public ResponseEntity<CartProductRE> clientDeleteCart(Authentication auth, @PathVariable("cart_id") Long cartId) {
+        return cartService.deleteCartById(auth, cartId);
+    }
 }
