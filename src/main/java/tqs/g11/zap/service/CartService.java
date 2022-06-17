@@ -1,5 +1,6 @@
 package tqs.g11.zap.service;
 
+import com.google.gson.JsonObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,11 +13,10 @@ import tqs.g11.zap.dto.CartProductsRE;
 import tqs.g11.zap.dto.LoginUser;
 import tqs.g11.zap.enums.ErrorMsg;
 import tqs.g11.zap.enums.UserRoles;
-import tqs.g11.zap.model.CartProduct;
-import tqs.g11.zap.model.Product;
-import tqs.g11.zap.model.User;
+import tqs.g11.zap.model.*;
 import tqs.g11.zap.repository.CartRepository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +28,15 @@ public class CartService {
 
     private final ProductService productService;
 
+    private static final Double storeLat = 40.62708219296578;
+    private static final Double storeLon = -8.64542661755792;
+    private static final String storeName = "ZAP - Glicínias, Aveiro";
+    private static final String storeUsername = "zap_glicinias";
+    private static final String storePassword = "sussy_Store@123";
+
+    private static final String deliverizeBaseURI = "http://localhost:8080";
+    private static final String deliverizeLogin = deliverizeBaseURI + "/api/users/login";
+    private static final String deliverizeOrder = deliverizeBaseURI + "/api/deliveries/company";
     public CartService(CartRepository cartRepository, UsersService usersService, ProductService productService) {
         this.cartRepository = cartRepository;
         this.usersService = usersService;
@@ -80,7 +89,7 @@ public class CartService {
         return ResponseEntity.badRequest().body(re);
     }
 
-    public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth) {
+    public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, CartCheckoutPostDTO cartCheckoutPostDTO) throws IOException {
         CartProductsRE re = new CartProductsRE();
         User client = usersService.getAuthUser((UserDetails) auth.getPrincipal());
         assert client.getRole().equals(UserRoles.CLIENT.toString());
@@ -91,10 +100,22 @@ public class CartService {
                         + cartProduct.getProduct().getProductId() + ")");
         }));
 
+        if (cartCheckoutPostDTO.getDestination().equals("") || cartCheckoutPostDTO.getDestination() == null) {
+            re.addError(ErrorMsg.DESTINATION_NOT_GIVEN.toString());
+        }
+
         if (re.getErrors().isEmpty()) {
             TqsBasicHttpClient httpClient = new TqsBasicHttpClient();
-            LoginUser loginUser = new LoginUser(client.getUsername(), client.getPassword());
-//            String response = httpClient.doHttpPost();
+            String username = client.getUsername();
+            LoginUser loginUser = new LoginUser(storeUsername, storePassword);
+            JsonObject loginResponse = httpClient.doHttpPost(deliverizeLogin, loginUser, null);
+
+            String token = loginResponse.getAsJsonObject("token").get("token").getAsString();
+
+            OrderPostDTO orderPostDTO = new OrderPostDTO(username, cartCheckoutPostDTO.getDestination(),
+                    cartCheckoutPostDTO.getNotes(), storeName, storeLat, storeLon);
+            JsonObject orderResponse = httpClient.doHttpPost(deliverizeOrder, orderPostDTO, token);
+            re.setCartProducts(cart);
         }
 
         return ResponseEntity.badRequest().body(re);

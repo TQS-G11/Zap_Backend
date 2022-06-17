@@ -1,6 +1,8 @@
 package tqs.g11.zap.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -29,7 +31,7 @@ public class TqsBasicHttpClient implements ISimpleHttpClient {
     }
 
     @Override
-    public String doHttpPost(String url, Object obj, String token) throws IOException {
+    public JsonObject doHttpPost(String url, Object obj, String token) throws IOException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpPost request = new HttpPost(url);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -43,7 +45,10 @@ public class TqsBasicHttpClient implements ISimpleHttpClient {
         CloseableHttpResponse response = client.execute(request);
         try {
             HttpEntity entity = response.getEntity();
-            return EntityUtils.toString(entity);
+            String resp = EntityUtils.toString(entity);
+            JsonObject jsonObject = new JsonParser().parse(resp).getAsJsonObject();
+            return jsonObject;
+
         } finally {
             response.close();
             client.close();

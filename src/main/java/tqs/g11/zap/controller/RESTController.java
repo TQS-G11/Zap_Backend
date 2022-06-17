@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 
+import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import tqs.g11.zap.dto.CartProductPost;
 import tqs.g11.zap.dto.CartProductRE;
 import tqs.g11.zap.dto.CartProductsRE;
+import tqs.g11.zap.model.CartCheckoutPostDTO;
 import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.service.CartService;
@@ -100,8 +102,9 @@ public class RESTController {
 
     @PreAuthorize("hasAnyRole('CLIENT')")
     @PostMapping("/cart/checkout")
-    public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth) {
-        return cartService.clientCartCheckout(auth);
+    @SneakyThrows
+    public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, @RequestBody CartCheckoutPostDTO cartCheckoutPostDTO) {
+        return cartService.clientCartCheckout(auth, cartCheckoutPostDTO);
     }
 
     @PreAuthorize("hasAnyRole('CLIENT')")
@@ -110,8 +113,4 @@ public class RESTController {
         return cartService.deleteCartById(auth, cartId);
     }
 
-    @GetMapping("/carts/user/{user_id}/checkout")
-    public ResponseEntity<String> checkoutCart(@PathVariable("id") Long id){
-        return null;
-    }
 }
