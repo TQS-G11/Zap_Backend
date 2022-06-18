@@ -31,10 +31,10 @@ public class CartService {
     private static final Double storeLat = 40.62708219296578;
     private static final Double storeLon = -8.64542661755792;
     private static final String storeName = "ZAP - Glicínias, Aveiro";
-    private static final String storeUsername = "zap_glicinias";
-    private static final String storePassword = "sussy_Store@123";
+    private static final String storeUsername = "Zap";
+    private static final String storePassword = "zapogus123";
 
-    private static final String deliverizeBaseURI = "http://localhost:8080";
+    private static final String deliverizeBaseURI = "http://deliverizebackend:8080";
     private static final String deliverizeLogin = deliverizeBaseURI + "/api/users/login";
     private static final String deliverizeOrder = deliverizeBaseURI + "/api/deliveries/company";
     public CartService(CartRepository cartRepository, UsersService usersService, ProductService productService) {
@@ -91,6 +91,7 @@ public class CartService {
 
     public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, CartCheckoutPostDTO cartCheckoutPostDTO) throws IOException {
         CartProductsRE re = new CartProductsRE();
+        System.out.println("Sussy test");
         User client = usersService.getAuthUser((UserDetails) auth.getPrincipal());
         assert client.getRole().equals(UserRoles.CLIENT.toString());
         List<CartProduct> cart = getCartsByUser(client);
@@ -108,7 +109,13 @@ public class CartService {
             TqsBasicHttpClient httpClient = new TqsBasicHttpClient();
             String username = client.getUsername();
             LoginUser loginUser = new LoginUser(storeUsername, storePassword);
+            System.out.println("Before function --------");
             JsonObject loginResponse = httpClient.doHttpPost(deliverizeLogin, loginUser, null);
+            System.out.println("login response");
+            System.out.println(loginResponse.toString());
+            System.out.println(loginResponse.getAsJsonObject("token").toString());
+            System.out.println(loginResponse.getAsJsonObject("token").get("token").toString());
+            System.out.println(loginResponse.getAsJsonObject("token").get("token").getAsString().toString());
 
             String token = loginResponse.getAsJsonObject("token").get("token").getAsString();
 
