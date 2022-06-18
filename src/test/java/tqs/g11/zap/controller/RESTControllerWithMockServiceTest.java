@@ -163,12 +163,16 @@ class RESTControllerWithServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username="user1", password="amogus123", roles="MANAGER")
     void createProduct() throws Exception {
         Product p1 = new Product(1L, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user1, 15.5, "Pen Drive");
 
+        Authentication auth = setUpUserMockAuth(user1);
+
         String content = objectMapper.writeValueAsString(p1);
-        System.out.println("Content");
-        System.out.println(content);
+
+        when(productService.createProduct(auth, p1)).thenReturn(p1);
+
         mvc.perform(post("/zap/products").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is("Amogi Pen")))
@@ -188,8 +192,6 @@ class RESTControllerWithServiceMockTest {
 
         List<CartProduct> cpsUser2 = new ArrayList<>(Arrays.asList(cp1, cp2));
         cpre.setCartProducts(cpsUser2);
-
-        Authentication auth = setUpUserMockAuth(user2);
 
         when(cartService.clientCartCheckout(any())).thenReturn(new ResponseEntity<CartProductsRE>(cpre, HttpStatus.OK));
 

@@ -3,7 +3,7 @@ package tqs.g11.zap.controller;
 import java.util.List;
 import java.util.Optional;
 
-
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -58,7 +58,7 @@ public class RESTController {
     @PostMapping("/products")
     public ResponseEntity<Product> createProduct(Authentication auth, @RequestBody Product product) {
         Product data = productService.createProduct(auth, product);
-        return ResponseEntity.ok().body(data);
+        return new ResponseEntity<Product>(data, HttpStatus.CREATED);
     }
 
 
