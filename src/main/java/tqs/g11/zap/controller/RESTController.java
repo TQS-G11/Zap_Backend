@@ -54,6 +54,7 @@ public class RESTController {
         return ResponseEntity.ok().body(data.get());
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/products")
     public ResponseEntity<Product> createProduct(Authentication auth, @RequestBody Product product) {
         Product data = productService.createProduct(auth, product);
@@ -99,7 +100,7 @@ public class RESTController {
     }
 
     @PreAuthorize("hasAnyRole('CLIENT')")
-    @PostMapping("/cart/checkout")
+    @GetMapping("/cart/checkout")
     public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth) {
         return cartService.clientCartCheckout(auth);
     }
@@ -108,10 +109,5 @@ public class RESTController {
     @DeleteMapping("/cart/{cart_id}")
     public ResponseEntity<CartProductRE> clientDeleteCart(Authentication auth, @PathVariable("cart_id") Long cartId) {
         return cartService.deleteCartById(auth, cartId);
-    }
-
-    @GetMapping("/carts/user/{user_id}/checkout")
-    public ResponseEntity<String> checkoutCart(@PathVariable("id") Long id){
-        return null;
     }
 }
