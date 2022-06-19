@@ -57,7 +57,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/zap/products/{id}",
                         "/zap/carts/user/{id}",
                         "/zap/carts/user/{id}/checkout",
-                        "/zap/cart/checkout")
+                        "/zap/cart/checkout",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()
