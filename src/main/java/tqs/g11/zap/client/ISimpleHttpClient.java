@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import java.io.IOException;
 
 public interface ISimpleHttpClient {
-    String doHttpGet(String query) throws IOException;
+    JsonObject doHttpGet(String query, String token) throws IOException;
 
     JsonObject doHttpPost(String url, Object obj, String token) throws IOException;
 }

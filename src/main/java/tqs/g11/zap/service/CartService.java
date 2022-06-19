@@ -1,5 +1,6 @@
 package tqs.g11.zap.service;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,8 @@ public class CartService {
 
     private final ProductService productService;
 
+    private final OrderService orderService;
+
     private static final Double storeLat = 40.62708219296578;
     private static final Double storeLon = -8.64542661755792;
     private static final String storeName = "ZAP - Glicínias, Aveiro";
@@ -37,10 +40,12 @@ public class CartService {
     private static final String deliverizeBaseURI = "http://deliverizebackend:8080";
     private static final String deliverizeLogin = deliverizeBaseURI + "/api/users/login";
     private static final String deliverizeOrder = deliverizeBaseURI + "/api/deliveries/company";
-    public CartService(CartRepository cartRepository, UsersService usersService, ProductService productService) {
+    public CartService(CartRepository cartRepository, UsersService usersService, ProductService productService,
+       OrderService orderService) {
         this.cartRepository = cartRepository;
         this.usersService = usersService;
         this.productService = productService;
+        this.orderService = orderService;
     }
 
     public Optional<CartProduct> getCartById(Long id) { return cartRepository.findById(id); }
@@ -105,24 +110,32 @@ public class CartService {
             re.addError(ErrorMsg.DESTINATION_NOT_GIVEN.toString());
         }
 
+        if (cart.isEmpty()) {
+            re.addError(ErrorMsg.NOT_CART_PRODUCT.toString());
+        }
+
         if (re.getErrors().isEmpty()) {
             TqsBasicHttpClient httpClient = new TqsBasicHttpClient();
             String username = client.getUsername();
             LoginUser loginUser = new LoginUser(storeUsername, storePassword);
-            System.out.println("Before function --------");
             JsonObject loginResponse = httpClient.doHttpPost(deliverizeLogin, loginUser, null);
-            System.out.println("login response");
-            System.out.println(loginResponse.toString());
-            System.out.println(loginResponse.getAsJsonObject("token").toString());
-            System.out.println(loginResponse.getAsJsonObject("token").get("token").toString());
-            System.out.println(loginResponse.getAsJsonObject("token").get("token").getAsString().toString());
-
             String token = loginResponse.getAsJsonObject("token").get("token").getAsString();
 
             OrderPostDTO orderPostDTO = new OrderPostDTO(username, cartCheckoutPostDTO.getDestination(),
-                    cartCheckoutPostDTO.getNotes(), storeName, storeLat, storeLon);
+                cartCheckoutPostDTO.getNotes(), storeName, storeLat, storeLon);
             JsonObject orderResponse = httpClient.doHttpPost(deliverizeOrder, orderPostDTO, token);
-            re.setCartProducts(cart);
+            System.out.println("orderResponse");
+            System.out.println(orderResponse.toString());
+            JsonArray errors = orderResponse.getAsJsonArray("errors");
+            if (errors.size() == 0) {
+                re.setCartProducts(cart);
+                JsonObject jsonOrder = orderResponse.getAsJsonObject("orderDto");
+                Long orderId = jsonOrder.get("id").getAsLong();
+
+                Order order = new Order(orderId, client);
+                orderService.save(order);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(re);
+            }
         }
 
         return ResponseEntity.badRequest().body(re);

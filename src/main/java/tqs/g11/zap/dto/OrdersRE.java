@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tqs.g11.zap.model.Order;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +18,13 @@ public class OrdersRE {
 
     @Getter
     @Setter
-    private List<OrderRE> orders;
+    private List<DeliverizeOrder> orders;
 
     public void addError(String error) {
         errors.add(error);
     }
 
-    public void addOrder(OrderRE order) {
+    public void addOrder(DeliverizeOrder order) {
         orders.add(order);
     }
 }

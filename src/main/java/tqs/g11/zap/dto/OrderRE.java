@@ -5,7 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,30 +14,13 @@ public class OrderRE {
 
     @Getter
     @Setter
-    private String destination;
+    private List<String> errors = new ArrayList<>();
 
     @Getter
     @Setter
-    private String notes;
+    private DeliverizeOrder order;
 
-    @Getter
-    @Setter
-    private String deliveryStatus;
-
-    @Getter
-    @Setter
-    private String origin;
-
-    @Getter
-    @Setter
-    private Double price;
-
-    @Getter
-    @Setter
-    private String requestedAt;
-
-    @Getter
-    @Setter
-    private String acceptedAt;
-
+    public void addError(String error) {
+        errors.add(error);
+    }
 }

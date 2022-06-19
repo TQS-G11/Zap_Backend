@@ -13,13 +13,12 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import tqs.g11.zap.dto.CartProductPost;
-import tqs.g11.zap.dto.CartProductRE;
-import tqs.g11.zap.dto.CartProductsRE;
+import tqs.g11.zap.dto.*;
 import tqs.g11.zap.model.CartCheckoutPostDTO;
 import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.service.CartService;
+import tqs.g11.zap.service.OrderService;
 import tqs.g11.zap.service.ProductService;
 
 @RestController
@@ -30,10 +29,12 @@ public class RESTController {
 
     private final ProductService productService;
     private final CartService cartService;
+    private final OrderService orderService;
 
-    public RESTController(ProductService productService, CartService cartService) {
+    public RESTController(ProductService productService, CartService cartService, OrderService orderService) {
         this.productService = productService;
         this.cartService = cartService;
+        this.orderService = orderService;
     }
 
     @Operation(summary = "Fetch all products available on the store")
@@ -111,6 +112,20 @@ public class RESTController {
     @DeleteMapping("/cart/{cart_id}")
     public ResponseEntity<CartProductRE> clientDeleteCart(Authentication auth, @PathVariable("cart_id") Long cartId) {
         return cartService.deleteCartById(auth, cartId);
+    }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @GetMapping("/orders")
+    @SneakyThrows
+    public ResponseEntity<OrdersRE> getOrdersByClient(Authentication auth) {
+        return orderService.getOrderByClient(auth);
+    }
+
+    @PreAuthorize("hasAnyRole('CLIENT')")
+    @GetMapping("/orders/{order_id}")
+    @SneakyThrows
+    public ResponseEntity<OrderRE> getOrderById(Authentication auth, @PathVariable("order_id") Long orderId) {
+        return orderService.getOrderById(orderId);
     }
 
 }
