@@ -4,30 +4,27 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tqs.g11.zap.model.CartProduct;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartProductsRE {
+public class OrdersRE {
+
     @Getter
     @Setter
     private List<String> errors = new ArrayList<>();
 
     @Getter
     @Setter
-    private List<CartProduct> cartProducts;
+    private List<DeliverizeOrder> orders;
 
     public void addError(String error) {
         errors.add(error);
     }
 
-    @Override
-    public String toString() {
-        return "CartProductsRE [cartProducts=" + cartProducts + ", errors=" + errors + "]";
+    public void addOrder(DeliverizeOrder order) {
+        orders.add(order);
     }
-
-    
 }

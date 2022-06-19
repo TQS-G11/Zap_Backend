@@ -1,19 +1,18 @@
-package tqs.g11.zap.dto;
+package tqs.g11.zap.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartProductPost {
+public class CartCheckoutPostDTO {
     @Getter
     @Setter
-    private Long productId;
+    private String destination;
 
     @Getter
     @Setter
-    private Integer quantity;
+    private String notes;
 }

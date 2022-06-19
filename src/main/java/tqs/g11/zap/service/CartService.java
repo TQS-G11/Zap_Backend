@@ -1,20 +1,23 @@
 package tqs.g11.zap.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import tqs.g11.zap.client.TqsBasicHttpClient;
 import tqs.g11.zap.dto.CartProductPost;
 import tqs.g11.zap.dto.CartProductRE;
 import tqs.g11.zap.dto.CartProductsRE;
+import tqs.g11.zap.dto.LoginUser;
 import tqs.g11.zap.enums.ErrorMsg;
 import tqs.g11.zap.enums.UserRoles;
-import tqs.g11.zap.model.CartProduct;
-import tqs.g11.zap.model.Product;
-import tqs.g11.zap.model.User;
+import tqs.g11.zap.model.*;
 import tqs.g11.zap.repository.CartRepository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,10 +29,23 @@ public class CartService {
 
     private final ProductService productService;
 
-    public CartService(CartRepository cartRepository, UsersService usersService, ProductService productService) {
+    private final OrderService orderService;
+
+    private static final Double storeLat = 40.62708219296578;
+    private static final Double storeLon = -8.64542661755792;
+    private static final String storeName = "ZAP - Glicínias, Aveiro";
+    private static final String storeUsername = "Zap";
+    private static final String storePassword = "zapogus123";
+
+    private static final String deliverizeBaseURI = "http://deliverizebackend:8080";
+    private static final String deliverizeLogin = deliverizeBaseURI + "/api/users/login";
+    private static final String deliverizeOrder = deliverizeBaseURI + "/api/deliveries/company";
+    public CartService(CartRepository cartRepository, UsersService usersService, ProductService productService,
+       OrderService orderService) {
         this.cartRepository = cartRepository;
         this.usersService = usersService;
         this.productService = productService;
+        this.orderService = orderService;
     }
 
     public Optional<CartProduct> getCartById(Long id) { return cartRepository.findById(id); }
@@ -78,8 +94,9 @@ public class CartService {
         return ResponseEntity.badRequest().body(re);
     }
 
-    public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth) {
+    public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, CartCheckoutPostDTO cartCheckoutPostDTO) throws IOException {
         CartProductsRE re = new CartProductsRE();
+        System.out.println("Sussy test");
         User client = usersService.getAuthUser((UserDetails) auth.getPrincipal());
         assert client.getRole().equals(UserRoles.CLIENT.toString());
         List<CartProduct> cart = getCartsByUser(client);
@@ -89,8 +106,36 @@ public class CartService {
                         + cartProduct.getProduct().getProductId() + ")");
         }));
 
+        if (cartCheckoutPostDTO.getDestination().equals("") || cartCheckoutPostDTO.getDestination() == null) {
+            re.addError(ErrorMsg.DESTINATION_NOT_GIVEN.toString());
+        }
+
+        if (cart.isEmpty()) {
+            re.addError(ErrorMsg.NOT_CART_PRODUCT.toString());
+        }
+
         if (re.getErrors().isEmpty()) {
-            // TODO: POST request to Deliverize to create order
+            TqsBasicHttpClient httpClient = new TqsBasicHttpClient();
+            String username = client.getUsername();
+            LoginUser loginUser = new LoginUser(storeUsername, storePassword);
+            JsonObject loginResponse = httpClient.doHttpPost(deliverizeLogin, loginUser, null);
+            String token = loginResponse.getAsJsonObject("token").get("token").getAsString();
+
+            OrderPostDTO orderPostDTO = new OrderPostDTO(username, cartCheckoutPostDTO.getDestination(),
+                cartCheckoutPostDTO.getNotes(), storeName, storeLat, storeLon);
+            JsonObject orderResponse = httpClient.doHttpPost(deliverizeOrder, orderPostDTO, token);
+            System.out.println("orderResponse");
+            System.out.println(orderResponse.toString());
+            JsonArray errors = orderResponse.getAsJsonArray("errors");
+            if (errors.size() == 0) {
+                re.setCartProducts(cart);
+                JsonObject jsonOrder = orderResponse.getAsJsonObject("orderDto");
+                Long orderId = jsonOrder.get("id").getAsLong();
+
+                Order order = new Order(orderId, client);
+                orderService.save(order);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(re);
+            }
         }
 
         return ResponseEntity.badRequest().body(re);

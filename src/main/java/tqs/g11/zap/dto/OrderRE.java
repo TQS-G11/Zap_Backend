@@ -1,23 +1,24 @@
 package tqs.g11.zap.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoginRE {
-    @Getter
-    @Setter
-    private List<String> errors;
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderRE {
 
     @Getter
     @Setter
-    private AuthToken token;
+    private List<String> errors = new ArrayList<>();
 
-    public LoginRE() {
-        errors = new ArrayList<>();
-    }
+    @Getter
+    @Setter
+    private DeliverizeOrder order;
 
     public void addError(String error) {
         errors.add(error);
