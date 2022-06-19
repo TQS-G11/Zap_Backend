@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderRequestDto {
-    @Getter
-    @Setter
-    private String buyer;
+public class OrderRE {
 
     @Getter
     @Setter
@@ -22,13 +21,22 @@ public class OrderRequestDto {
 
     @Getter
     @Setter
+    private String deliveryStatus;
+
+    @Getter
+    @Setter
     private String origin;
 
     @Getter
     @Setter
-    private Double storeLat;
+    private Double price;
 
     @Getter
     @Setter
-    private Double storeLon;
+    private String requestedAt;
+
+    @Getter
+    @Setter
+    private String acceptedAt;
+
 }
