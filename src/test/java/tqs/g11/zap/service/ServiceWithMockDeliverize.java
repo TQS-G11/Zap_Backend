@@ -48,20 +48,4 @@ class ServiceWithMockDeliverize {
 
         when(cartRepository.findByUserId(1L)).thenReturn(cartList);
     }
-
-    @Test
-    void checkoutCart() throws IOException{
-
-        // Success Case
-        when(client.doHttpGet(url)).thenReturn("");
-        assertThat(service.checkoutCart(1L)).isTrue();
-
-
-
-        // Fail Case
-        when(client.doHttpGet(url)).thenReturn("");
-        assertThat(service.checkoutCart(1L)).isFalse();
-
-    }
-
 }

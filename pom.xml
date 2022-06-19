@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>tqs.g11</groupId>
-	<artifactId>zap</artifactId>
+	<artifactId>Zap_Backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Zap</name>
+	<name>Zap_Backend</name>
 	<description>Backend for the Zap Electronics store.</description>
 	<properties>
 		<java.version>11</java.version>
@@ -21,6 +21,7 @@
 		<sonar.organization>tqs-g11</sonar.organization>
   		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<sonar.projectKey>TQS-G11_Zap_Backend</sonar.projectKey>
+		<sonar.projectName>Zap_Backend</sonar.projectName>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -74,6 +75,12 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.6.8</version>
+		</dependency>
 		
 		
 		<dependency>
@@ -93,6 +100,7 @@
             <scope>runtime</scope>
         </dependency>
 
+
 		<!--    apache http tools -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -100,12 +108,21 @@
             <version>4.5.10</version>
         </dependency>
 
+
         <!-- json tools -->
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
         </dependency>
+
+		<!-- Gson -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.5</version>
+		</dependency>
+
 
 	</dependencies>
 	<dependencyManagement>

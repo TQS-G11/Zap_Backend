@@ -5,15 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginUser {
+public class CartCheckoutPostDTO {
     @Getter
     @Setter
-    private String username;
+    private String destination;
 
     @Getter
     @Setter
-    private String password;
+    private String notes;
 }

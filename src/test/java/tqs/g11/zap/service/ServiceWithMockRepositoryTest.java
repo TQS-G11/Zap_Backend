@@ -6,6 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import tqs.g11.zap.dto.CartProductPost;
+import tqs.g11.zap.dto.CartProductRE;
+import tqs.g11.zap.enums.ErrorMsg;
 import tqs.g11.zap.enums.UserRoles;
 import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
@@ -13,18 +21,15 @@ import tqs.g11.zap.model.User;
 import tqs.g11.zap.repository.CartRepository;
 import tqs.g11.zap.repository.ProductRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ServiceWithMockRepositoryTest {
-
+class ServiceWithMockRepositoryTest {
     @Mock(lenient = true)
     private ProductRepository productRepository;
 
@@ -37,15 +42,27 @@ public class ServiceWithMockRepositoryTest {
     @InjectMocks
     private CartService cartService;
 
-//    @Mock
-//    private UsersService usersService;
+    @Mock(lenient = true)
+    private UsersService usersService;
+
+    @InjectMocks
+    private OrderService orderService;
+
+    private User manager;
+
+    private User client;
+
+    private List<CartProduct> clientCartProducts;
+
+    private Product product1;
+
+    private Product product2;
+
+    private Product product3;
 
     @BeforeEach
-//    @WithMockUser(username = "sussycosta", roles = {"CLIENT"})
     void setUp() {
-//        when(usersService.getAuthUser(any())).thenReturn(mockUser);
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user = usersService.getAuthUser((UserDetails) authentication.getPrincipal());
+        manager = new User("caio_costela", "Caio Costela", "amogus123", UserRoles.MANAGER);
 
         User user1 = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
         User user2 = new User("user2", "Deinis Lie", "sussybot564", UserRoles.CLIENT);
@@ -66,11 +83,30 @@ public class ServiceWithMockRepositoryTest {
 
         List<CartProduct> cpsUser3 = new ArrayList<>(Arrays.asList(cp3, cp4, cp5));
 
-        when(productRepository.findByProductNameIgnoreCaseContaining("Among")).thenReturn(List.of(p1));
+        product1 = new Product(200L, "Product 200", "img", "description",
+                200, user1, 200.0, "category");
+        product2 = new Product(201L, "Product 201", "img", "description",
+                201, user1, 201.0, "category");
+        product3 = new Product(202L, "Product 202", "img", "description",
+                202, user1, 202.0, "category");
+        client = new User("client", "A Client", "clientpassword", UserRoles.CLIENT);
+        client.setId(100L);
+        clientCartProducts = Arrays.asList(
+                new CartProduct(101L, product1, 1, client),
+                new CartProduct(102L, product2, 2, client)
+        );
+        when(cartRepository.findByUserId(client.getId())).thenReturn(clientCartProducts);
+        Arrays.asList(product1, product2, product3).forEach(
+                p -> when(productRepository.getProductByProductId(p.getProductId())).thenReturn(Optional.of(p))
+        );
+
+
+        when(productRepository.findByNameIgnoreCaseContaining("Among")).thenReturn(List.of(p1));
         when(productRepository.getProductByProductId(2L)).thenReturn(Optional.of(p2));
         when(productRepository.findByCategoryContains("Charger")).thenReturn(Arrays.asList(p2, p3));
-        when(productRepository.findByProductNameContainsAndCategoryContains("Cellphone", "Charger")).thenReturn(List.of(p3));
+        when(productRepository.findByNameContainsAndCategoryContains("Cellphone", "Charger")).thenReturn(List.of(p3));
         when(productRepository.findAll()).thenReturn(Arrays.asList(p1, p2, p3));
+        when(productRepository.save(any())).thenReturn(p1);
 
         when(cartRepository.findByUserId(2L)).thenReturn(cpsUser2);
         when(cartRepository.findByUserId(3L)).thenReturn(cpsUser3);
@@ -81,15 +117,15 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProducts();
 
         assertThat(products).hasSize(3);
-        assertThat(products.get(0).getProductName()).isEqualTo("Among Us Pen Drive");
+        assertThat(products.get(0).getName()).isEqualTo("Among Us Pen Drive");
     }
 
     @Test
     void getProductById() {
         Optional<Product> product = productService.getProductById(2L);
 
-        assertThat(product.isEmpty()).isFalse();
-        assertThat(product.get().getProductName()).isEqualTo("Notebook super charger");
+        assertThat(product).isPresent();
+        assertThat(product.get().getName()).isEqualTo("Notebook super charger");
 
     }
 
@@ -98,7 +134,7 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProductsByName("Among");
 
         assertThat(products).hasSize(1);
-        assertThat(products.get(0).getProductName()).isEqualTo("Among Us Pen Drive");
+        assertThat(products.get(0).getName()).isEqualTo("Among Us Pen Drive");
     }
 
     @Test
@@ -106,8 +142,8 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProductsByCategory("Charger");
 
         assertThat(products).hasSize(2);
-        assertThat(products.get(0).getProductName()).isEqualTo("Notebook super charger");
-        assertThat(products.get(1).getProductName()).isEqualTo("Cellphone super charger");
+        assertThat(products.get(0).getName()).isEqualTo("Notebook super charger");
+        assertThat(products.get(1).getName()).isEqualTo("Cellphone super charger");
 
     }
 
@@ -116,7 +152,20 @@ public class ServiceWithMockRepositoryTest {
         List<Product> products = productService.getProductsByNameAndCategory("Cellphone", "Charger");
 
         assertThat(products).hasSize(1);
-        assertThat(products.get(0).getProductName()).isEqualTo("Cellphone super charger");
+        assertThat(products.get(0).getName()).isEqualTo("Cellphone super charger");
+    }
+
+    @Test
+    void createProduct() {
+
+        Authentication auth = setUpUserMockAuth(manager);
+
+        Product p1 = new Product(1L, "Among Us Pen Drive", "url1", "An Among Us pen drive", 69, null, 420.69, "Pen Drive");
+
+        Product output = productService.createProduct(auth, p1);
+
+        assertThat(output.getName()).isEqualTo("Among Us Pen Drive");
+        assertThat(output.getOwner().getName()).isEqualTo("Caio Costela");
     }
 
     @Test
@@ -137,5 +186,42 @@ public class ServiceWithMockRepositoryTest {
         assertThat(cartProducts).hasSize(3);
     }
 
+    @Test
+    void testGetClientCart() {
+        Authentication auth = setUpUserMockAuth(client);
+        List<CartProduct> cart = cartService.getClientCart(auth);
+        assertThat(cart).isEqualTo(clientCartProducts);
+    }
 
+    @Test
+    void testClientAddCartProductOk() {
+        cartService = new CartService(cartRepository, usersService, productService, orderService);
+        Authentication auth = setUpUserMockAuth(client);
+        CartProductPost postBody = new CartProductPost(product3.getProductId(), 1);
+        ResponseEntity<CartProductRE> re = cartService.clientAddCartProduct(auth, postBody);
+        assertThat(re.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+
+    @Test
+    void testClientAddCartProductNotEnoughStock() {
+        cartService = new CartService(cartRepository, usersService, productService, orderService);
+        Authentication auth = setUpUserMockAuth(client);
+        CartProductPost postBody = new CartProductPost(product3.getProductId(), 1000);
+        ResponseEntity<CartProductRE> re = cartService.clientAddCartProduct(auth, postBody);
+        assertThat(re.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(Objects.requireNonNull(re.getBody()).getErrors())
+                .isEqualTo(List.of(ErrorMsg.PRODUCT_NOT_ENOUGH_STOCK.toString()));
+    }
+
+    private Authentication setUpUserMockAuth(User user) {
+        Authentication auth = mock(Authentication.class);
+        Set<SimpleGrantedAuthority> authorities = Collections.singleton(
+                new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getUsername(), user.getPassword(), authorities
+        );
+        when(auth.getPrincipal()).thenReturn(userDetails);
+        when(usersService.getAuthUser(userDetails)).thenReturn(user);
+        return auth;
+    }
 }
