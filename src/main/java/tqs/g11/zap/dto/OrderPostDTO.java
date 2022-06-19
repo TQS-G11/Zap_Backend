@@ -1,4 +1,4 @@
-package tqs.g11.zap.model;
+package tqs.g11.zap.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

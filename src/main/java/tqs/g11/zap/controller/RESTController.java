@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import tqs.g11.zap.dto.*;
-import tqs.g11.zap.model.CartCheckoutPostDTO;
 import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.service.CartService;
@@ -132,7 +131,7 @@ public class RESTController {
         @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
     })
     @PreAuthorize("hasAnyRole('CLIENT')")
-    @GetMapping("/cart/checkout")
+    @PostMapping("/cart/checkout")
     @SneakyThrows
     public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, @RequestBody CartCheckoutPostDTO cartCheckoutPostDTO) {
         return cartService.clientCartCheckout(auth, cartCheckoutPostDTO);
