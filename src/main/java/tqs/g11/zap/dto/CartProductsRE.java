@@ -23,4 +23,11 @@ public class CartProductsRE {
     public void addError(String error) {
         errors.add(error);
     }
+
+    @Override
+    public String toString() {
+        return "CartProductsRE [cartProducts=" + cartProducts + ", errors=" + errors + "]";
+    }
+
+    
 }

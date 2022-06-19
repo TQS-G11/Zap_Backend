@@ -16,12 +16,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import tqs.g11.zap.auth.TokenProvider;
 import tqs.g11.zap.auth.UnauthorizedEntryPoint;
+import tqs.g11.zap.dto.CartProductRE;
+import tqs.g11.zap.dto.CartProductsRE;
+import tqs.g11.zap.enums.ErrorMsg;
 import tqs.g11.zap.enums.UserRoles;
 import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
@@ -31,8 +39,10 @@ import tqs.g11.zap.service.ProductService;
 import tqs.g11.zap.service.UsersService;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @WebMvcTest(RESTController.class)
 class RESTControllerWithServiceMockTest {
@@ -48,7 +58,7 @@ class RESTControllerWithServiceMockTest {
 
 
     @MockBean
-    private UsersService service2;
+    private UsersService usersService;
 
     @MockBean
     private UnauthorizedEntryPoint u;
@@ -153,15 +163,72 @@ class RESTControllerWithServiceMockTest {
     }
 
     @Test
+    @WithMockUser(username="user1", password="amogus123", roles="MANAGER")
     void createProduct() throws Exception {
         Product p1 = new Product(1L, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user1, 15.5, "Pen Drive");
 
+        Authentication auth = setUpUserMockAuth(user1);
+
         String content = objectMapper.writeValueAsString(p1);
-        System.out.println("Content");
-        System.out.println(content);
+
+        when(productService.createProduct(auth, p1)).thenReturn(p1);
+
         mvc.perform(post("/zap/products").contentType(MediaType.APPLICATION_JSON).content(content))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is("Amogi Pen")))
                 .andExpect(jsonPath("$.owner.username", is(user1.getUsername())));
+    }
+
+    @Test
+    @WithMockUser(username="user2", password="sussybot564", roles="CLIENT")
+    void clientCartCheckout() throws Exception {
+
+        CartProductsRE cpre = new CartProductsRE();
+
+        Product p1 = new Product(1L, "Amogi Pen", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 4, user1, 15.5, "Pen Drive");
+        Product p2 = new Product(2L, "USB Cable", "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/7dea57109222637.5fcf37f1395c7.png", "", 3, user1, 3.0, "Cable");
+        CartProduct cp1 = new CartProduct(1L, p1, 1, user2);
+        CartProduct cp2 = new CartProduct(2L, p2, 3, user2);
+
+        List<CartProduct> cpsUser2 = new ArrayList<>(Arrays.asList(cp1, cp2));
+        cpre.setCartProducts(cpsUser2);
+
+        when(cartService.clientCartCheckout(any())).thenReturn(new ResponseEntity<CartProductsRE>(cpre, HttpStatus.OK));
+
+        mvc.perform(get("/zap/cart/checkout").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.errors", hasSize(0)))
+            .andExpect(jsonPath("$.cartProducts", hasSize(2)));
+
+
+        String error1 = ErrorMsg.PRODUCT_NOT_ENOUGH_STOCK + " (ID: " + cp1.getProduct().getProductId() + ")";
+        String error2 = ErrorMsg.PRODUCT_NOT_FOUND.toString();
+
+        List<String> errors = new ArrayList<>(Arrays.asList(error1, error2));
+        cpre.setErrors(errors);
+        cpre.setCartProducts(new ArrayList<>());
+        
+        
+        when(cartService.clientCartCheckout(any())).thenReturn(new ResponseEntity<CartProductsRE>(cpre, HttpStatus.OK));
+
+        mvc.perform(get("/zap/cart/checkout").contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.cartProducts", hasSize(0)))
+        .andExpect(jsonPath("$.errors", hasSize(2)))
+        .andExpect(jsonPath("$.errors[0]", is(error1)))
+        .andExpect(jsonPath("$.errors[1]", is(error2)));
+
+    }
+
+    private Authentication setUpUserMockAuth(User user) {
+        Authentication auth = mock(Authentication.class);
+        Set<SimpleGrantedAuthority> authorities = Collections.singleton(
+                new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getUsername(), user.getPassword(), authorities
+        );
+        when(auth.getPrincipal()).thenReturn(userDetails);
+        when(usersService.getAuthUser(userDetails)).thenReturn(user);
+        return auth;
     }
 }
