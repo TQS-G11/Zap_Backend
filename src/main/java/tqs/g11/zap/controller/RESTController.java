@@ -132,7 +132,7 @@ public class RESTController {
         @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
     })
     @PreAuthorize("hasAnyRole('CLIENT')")
-    @GetMapping("/cart/checkout")
+    @PostMapping("/cart/checkout")
     @SneakyThrows
     public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, @RequestBody CartCheckoutPostDTO cartCheckoutPostDTO) {
         return cartService.clientCartCheckout(auth, cartCheckoutPostDTO);

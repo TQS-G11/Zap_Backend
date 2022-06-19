@@ -27,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import tqs.g11.zap.auth.TokenProvider;
 import tqs.g11.zap.auth.UnauthorizedEntryPoint;
+import tqs.g11.zap.dto.CartCheckoutPostDTO;
 import tqs.g11.zap.dto.CartProductRE;
 import tqs.g11.zap.dto.CartProductsRE;
 import tqs.g11.zap.enums.ErrorMsg;
@@ -35,6 +36,7 @@ import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.model.User;
 import tqs.g11.zap.service.CartService;
+import tqs.g11.zap.service.OrderService;
 import tqs.g11.zap.service.ProductService;
 import tqs.g11.zap.service.UsersService;
 
@@ -56,9 +58,11 @@ class RESTControllerWithServiceMockTest {
     @MockBean
     private CartService cartService;
 
-
     @MockBean
     private UsersService usersService;
+
+    @MockBean
+    private OrderService orderService;
 
     @MockBean
     private UnauthorizedEntryPoint u;
@@ -193,9 +197,12 @@ class RESTControllerWithServiceMockTest {
         List<CartProduct> cpsUser2 = new ArrayList<>(Arrays.asList(cp1, cp2));
         cpre.setCartProducts(cpsUser2);
 
-        when(cartService.clientCartCheckout(any())).thenReturn(new ResponseEntity<CartProductsRE>(cpre, HttpStatus.OK));
+        CartCheckoutPostDTO details = new CartCheckoutPostDTO();
+        String postDetails = objectMapper.writeValueAsString(details);
 
-        mvc.perform(get("/zap/cart/checkout").contentType(MediaType.APPLICATION_JSON))
+        when(cartService.clientCartCheckout(any(), any())).thenReturn(new ResponseEntity<CartProductsRE>(cpre, HttpStatus.OK));
+
+        mvc.perform(post("/zap/cart/checkout").contentType(MediaType.APPLICATION_JSON).content(postDetails))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.errors", hasSize(0)))
             .andExpect(jsonPath("$.cartProducts", hasSize(2)));
@@ -209,9 +216,9 @@ class RESTControllerWithServiceMockTest {
         cpre.setCartProducts(new ArrayList<>());
         
         
-        when(cartService.clientCartCheckout(any())).thenReturn(new ResponseEntity<CartProductsRE>(cpre, HttpStatus.OK));
+        when(cartService.clientCartCheckout(any(), any())).thenReturn(new ResponseEntity<CartProductsRE>(cpre, HttpStatus.OK));
 
-        mvc.perform(get("/zap/cart/checkout").contentType(MediaType.APPLICATION_JSON))
+        mvc.perform(post("/zap/cart/checkout").contentType(MediaType.APPLICATION_JSON).content(postDetails))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.cartProducts", hasSize(0)))
         .andExpect(jsonPath("$.errors", hasSize(2)))
