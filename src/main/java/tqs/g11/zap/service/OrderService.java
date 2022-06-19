@@ -12,18 +12,12 @@ import tqs.g11.zap.dto.LoginUser;
 import tqs.g11.zap.dto.DeliverizeOrder;
 import tqs.g11.zap.dto.OrderRE;
 import tqs.g11.zap.dto.OrdersRE;
-import tqs.g11.zap.enums.ErrorMsg;
-import tqs.g11.zap.model.Order;
 import tqs.g11.zap.model.User;
-import tqs.g11.zap.repository.OrderRepository;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Service
 public class OrderService {
-
-    private final OrderRepository orderRepository;
     private final UsersService usersService;
 
     private static final String deliverizeBaseURI = "http://deliverizebackend:8080";
@@ -36,13 +30,8 @@ public class OrderService {
     private static final String storePassword = "zapogus123";
 
 
-    public OrderService(OrderRepository orderRepository, UsersService usersService) {
-        this.orderRepository = orderRepository;
+    public OrderService(UsersService usersService) {
         this.usersService = usersService;
-    }
-
-    public void save(Order order) {
-        orderRepository.save(order);
     }
 
     public ResponseEntity<OrdersRE> getAllOrders(Authentication auth) throws IOException {
@@ -59,14 +48,10 @@ public class OrderService {
 
         String token = getCompanyToken(httpClient);
 
-        Optional<Order> orderOptional = orderRepository.findById(id);
-        if (orderOptional.isEmpty()) {
-            re.addError(ErrorMsg.ORDER_NOT_FOUND.toString());
-        }
+        JsonObject response = httpClient.doHttpGet(ordersURI + "/" + id, token);
+        JsonArray errors = response.getAsJsonArray("errors");
 
         if (re.getErrors().isEmpty()) {
-            JsonObject response = httpClient.doHttpGet(ordersURI + "/" + id, token);
-            JsonArray errors = response.getAsJsonArray("errors");
             if (errors.size() == 0) {
                 JsonElement orderJson = response.get("order");
                 DeliverizeOrder order = createDeliverizeOrder(orderJson);
@@ -119,6 +104,14 @@ public class OrderService {
 
     private DeliverizeOrder createDeliverizeOrder(JsonElement jsonElement) {
         JsonObject jsonOrder = jsonElement.getAsJsonObject();
+        String accepted;
+
+        try {
+            accepted = jsonOrder.get("acceptedAt").getAsString();
+        }
+        catch (UnsupportedOperationException e) {
+            accepted = null;
+        }
         return new DeliverizeOrder(
                 jsonOrder.get("destination").getAsString(),
                 jsonOrder.get("notes").getAsString(),
@@ -126,7 +119,7 @@ public class OrderService {
                 jsonOrder.get("origin").getAsString(),
                 jsonOrder.get("price").getAsDouble(),
                 jsonOrder.get("requestedAt").getAsString(),
-                jsonOrder.get("acceptedAt").getAsString()
+                accepted
         );
     }
 

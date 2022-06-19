@@ -1,22 +1,18 @@
-package tqs.g11.zap.model;
+package tqs.g11.zap.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.ManyToOne;
-
-@AllArgsConstructor
 @NoArgsConstructor
-public class Order {
-
-    @Setter
+@AllArgsConstructor
+public class CartCheckoutPostDTO {
     @Getter
-    Long id;
-
     @Setter
+    private String destination;
+
     @Getter
-    @ManyToOne
-    User user;
+    @Setter
+    private String notes;
 }
