@@ -45,6 +45,9 @@ class ServiceWithMockRepositoryTest {
     @Mock(lenient = true)
     private UsersService usersService;
 
+    @InjectMocks
+    private OrderService orderService;
+
     private User manager;
 
     private User client;
@@ -192,7 +195,7 @@ class ServiceWithMockRepositoryTest {
 
     @Test
     void testClientAddCartProductOk() {
-        cartService = new CartService(cartRepository, usersService, productService);
+        cartService = new CartService(cartRepository, usersService, productService, orderService);
         Authentication auth = setUpUserMockAuth(client);
         CartProductPost postBody = new CartProductPost(product3.getProductId(), 1);
         ResponseEntity<CartProductRE> re = cartService.clientAddCartProduct(auth, postBody);
@@ -201,7 +204,7 @@ class ServiceWithMockRepositoryTest {
 
     @Test
     void testClientAddCartProductNotEnoughStock() {
-        cartService = new CartService(cartRepository, usersService, productService);
+        cartService = new CartService(cartRepository, usersService, productService, orderService);
         Authentication auth = setUpUserMockAuth(client);
         CartProductPost postBody = new CartProductPost(product3.getProductId(), 1000);
         ResponseEntity<CartProductRE> re = cartService.clientAddCartProduct(auth, postBody);
