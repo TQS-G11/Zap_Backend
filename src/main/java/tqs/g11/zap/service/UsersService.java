@@ -1,6 +1,7 @@
 package tqs.g11.zap.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -36,6 +37,11 @@ public class UsersService implements UserDetailsService {
 
     public User getAuthUser(UserDetails details) {
         return usersRepository.findByUsernameAndPassword(details.getUsername(), details.getPassword());
+    }
+
+    public User getAuthUser(Authentication auth) {
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        return getAuthUser(userDetails);
     }
 
     @Override

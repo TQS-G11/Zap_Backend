@@ -7,11 +7,7 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderRequestDto {
-    @Getter
-    @Setter
-    private String buyer;
-
+public class CartCheckoutPostDTO {
     @Getter
     @Setter
     private String destination;
@@ -19,16 +15,4 @@ public class OrderRequestDto {
     @Getter
     @Setter
     private String notes;
-
-    @Getter
-    @Setter
-    private String origin;
-
-    @Getter
-    @Setter
-    private Double storeLat;
-
-    @Getter
-    @Setter
-    private Double storeLon;
 }
