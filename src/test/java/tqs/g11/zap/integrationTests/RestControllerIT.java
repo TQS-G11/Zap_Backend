@@ -1,6 +1,7 @@
 package tqs.g11.zap.integrationTests;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -61,7 +63,9 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.aspectj.lang.annotation.Before;
@@ -93,17 +97,23 @@ class RestControllerIT {
     User user2 = new User("user2", "Deinis Lie", "sussybot564", UserRoles.CLIENT);
     User user3 = new User("user3", "Licius Vinicious", "edinaldus", UserRoles.CLIENT);
 
+    Product p1 = new Product(1L, "Among Us Pen Drive", "url1", "An Among Us pen drive", 69, user1, 420.69, "Pen Drive");
+    Product p2 = new Product(2L, "Notebook super charger", "url2", "A notebook charger", 40, user1, 69.0, "Charger");
+    Product p3 = new Product(3L, "Cellphone super charger", "url3", "An Among Us pen drive", 13, user1, 23.4, "Charger");
+
+
+
     AuthToken authToken;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
-    @BeforeEach
+    
     void setUp() {
-
-        Product p1 = new Product(1L, "Among Us Pen Drive", "url1", "An Among Us pen drive", 69, user1, 420.69, "Pen Drive");
-        Product p2 = new Product(2L, "Notebook super charger", "url2", "A notebook charger", 40, user1, 69.0, "Charger");
-        Product p3 = new Product(3L, "Cellphone super charger", "url3", "An Among Us pen drive", 13, user1, 23.4, "Charger");
+        productRep.save(p1);
+        productRep.save(p2);
+        productRep.save(p3);
+        productRep.flush();
 
         CartProduct cp1 = new CartProduct(1L, p1, 1, user2);
         CartProduct cp2 = new CartProduct(2L, p3, 3, user2);
@@ -116,12 +126,16 @@ class RestControllerIT {
         
     }
 
-
     @Test
-    @Order(1)
+    void runTests() throws JsonProcessingException{
+        signUp();
+        login();
+        createProducts();
+    }
+
+
     void signUp() throws JsonProcessingException{
         UserDto newUser = new UserDto(user1);
-
         ResponseEntity<SignupRE> response = restTemplate.postForEntity("/api/users/signup", newUser, SignupRE.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -129,10 +143,13 @@ class RestControllerIT {
         List<User> found = usersRep.findAll();
         assertThat(found).extracting(User::getName).contains(user1.getName());
 
+        newUser = new UserDto(user2);
+        response = restTemplate.postForEntity("/api/users/signup", newUser, SignupRE.class);
+        newUser = new UserDto(user3);
+        response = restTemplate.postForEntity("/api/users/signup", newUser, SignupRE.class);
+
     }
 
-    @Test
-    @Order(2)
     void login() throws JsonProcessingException{
         LoginUser credentials1 = new LoginUser(user1.getUsername(), user1.getPassword());
         LoginUser credentials2 = new LoginUser(user1.getUsername(), "");
@@ -164,9 +181,69 @@ class RestControllerIT {
         assertThat(errors).isEmpty();
 
         authToken = response.getBody().getToken();
+
         assertThat(authToken).isNotNull();
     }
 
+    void createProducts(){
+
+        ResponseEntity<Product> response = restTemplate.postForEntity("/zap/products", p1, Product.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+
+        HttpHeaders headers = new HttpHeaders();
+
+
+        headers.setBearerAuth(authToken.getToken());
+
+        Map<String, Product> map = new HashMap<>();
+        map.put("product", p1);
+        HttpEntity<Map<String,Product>> request = new HttpEntity(map, headers);
+        
+
+        response = restTemplate.postForEntity("/zap/products", request, Product.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody().getProductId()).isEqualTo(p1.getProductId());
+
+        map.put("product", p2);
+        request = new HttpEntity<>(map, headers);
+
+        response = restTemplate.postForEntity("/zap/products", request, Product.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody().getProductId()).isEqualTo(p2.getProductId());
+
+
+        map.put("product", p2);
+        request = new HttpEntity<>(map, headers);
+
+        response = restTemplate.postForEntity("/zap/products", request, Product.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody().getProductId()).isEqualTo(p3.getProductId());
+    }
+
+    // @Test
+    // @Order(4)
+    // void getProducts() {
+
+    //     //productRep.save(p1);
+    //     //productRep.save(p2);
+    //     //productRep.save(p3);
+    //     //productRep.flush();
+
+    //     ResponseEntity<List<Product>> response = restTemplate.exchange(
+    //                                                         "/zap/products",
+    //                                                         HttpMethod.GET,
+    //                                                         null,
+    //                                                         new ParameterizedTypeReference<List<Product>>(){}
+    //     );
+
+    //     assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+    //     assertThat(response.getBody())
+    //         .extracting(Product::getProductId)
+    //         .contains(p1.getProductId(),p2.getProductId(),p3.getProductId());
+
+
+
+    // }
 
     // @Test
     // void checkoutCart(){
