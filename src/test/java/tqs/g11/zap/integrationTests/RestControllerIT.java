@@ -17,7 +17,8 @@ import org.springframework.http.ResponseEntity;
 //import org.springframework.test.context.TestPropertySource;
 
 import tqs.g11.zap.dto.AuthToken;
-
+import tqs.g11.zap.dto.CartCheckoutPostDTO;
+import tqs.g11.zap.dto.CartProductsRE;
 import tqs.g11.zap.dto.LoginRE;
 import tqs.g11.zap.dto.LoginUser;
 import tqs.g11.zap.dto.SignupRE;
@@ -92,6 +93,7 @@ class RestControllerIT {
         createProducts();
         getProducts();
         getProductById();
+        checkoutCart();
     }
 
 
@@ -152,8 +154,6 @@ class RestControllerIT {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
         HttpHeaders headers = new HttpHeaders();
-
-
         headers.setBearerAuth(authToken.getToken());
 
         Map<String, Product> map = new HashMap<>();
@@ -212,27 +212,25 @@ class RestControllerIT {
 
     }
 
-    // @Test
-    // void checkoutCart(){
+    void checkoutCart(){
 
-    //     HttpHeaders headers = new HttpHeaders();
-    //     headers.setContentType(MediaType.APPLICATION_JSON);
-
-    //     //Sign-up/Login
+        HttpHeaders headers = new HttpHeaders();
         
+        CartCheckoutPostDTO details = new CartCheckoutPostDTO("Aveiro", "Hello :)");
+        Map<String, CartCheckoutPostDTO> map = new HashMap<>();
+        map.put("cartCheckoutPostDTO", details);
+        HttpEntity<Map<String,Product>> request = new HttpEntity(map, headers);
 
-    //     //Authentication auth = setUpUserMockAuth(user1);
-
-    //     //headers.setBearerAuth(auth.toString());
-    //     //System.out.println(auth);
-
-
-    //     CartCheckoutPostDTO details = new CartCheckoutPostDTO("Aveiro", "Hello :)");
-    //     ResponseEntity<CartProductsRE> response = restTemplate.postForEntity("/zap/cart/checkout", details, CartProductsRE.class);
+        ResponseEntity<CartProductsRE> response = restTemplate.postForEntity("/zap/cart/checkout", request, CartProductsRE.class);
             
-    //     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    //     //assertThat(response.getBody()).contains("Checkout Successful");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+
+        headers.setBearerAuth(authToken.getToken());
+
+
+
+        //assertThat(response.getBody()).contains("Checkout Successful");
     
-    // }
+    }
     
 }
