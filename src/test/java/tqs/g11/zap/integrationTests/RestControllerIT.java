@@ -17,8 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.test.context.TestPropertySource;
 
+import tqs.g11.zap.dto.AuthToken;
 import tqs.g11.zap.dto.CartCheckoutPostDTO;
 import tqs.g11.zap.dto.CartProductsRE;
+import tqs.g11.zap.dto.LoginRE;
+import tqs.g11.zap.dto.LoginUser;
 import tqs.g11.zap.dto.SignupRE;
 import tqs.g11.zap.dto.UserDto;
 import tqs.g11.zap.enums.UserRoles;
@@ -90,6 +93,8 @@ class RestControllerIT {
     User user2 = new User("user2", "Deinis Lie", "sussybot564", UserRoles.CLIENT);
     User user3 = new User("user3", "Licius Vinicious", "edinaldus", UserRoles.CLIENT);
 
+    AuthToken authToken;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -124,6 +129,42 @@ class RestControllerIT {
         List<User> found = usersRep.findAll();
         assertThat(found).extracting(User::getName).contains(user1.getName());
 
+    }
+
+    @Test
+    @Order(2)
+    void login() throws JsonProcessingException{
+        LoginUser credentials1 = new LoginUser(user1.getUsername(), user1.getPassword());
+        LoginUser credentials2 = new LoginUser(user1.getUsername(), "");
+        LoginUser credentials3 = new LoginUser("", user1.getPassword());
+        LoginUser credentials4 = new LoginUser("Name", "Password");
+
+        // Blank password
+        ResponseEntity<LoginRE> response = restTemplate.postForEntity("/api/users/login", credentials2, LoginRE.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        List<String> errors = response.getBody().getErrors();
+        assertThat(errors).contains("Password field cannot be blank.", "Invalid credentials.");
+
+        // Blank Username
+        response = restTemplate.postForEntity("/api/users/login", credentials3, LoginRE.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        errors = response.getBody().getErrors();
+        assertThat(errors).contains("Username field cannot be blank.", "Invalid credentials.");
+
+        // Invalid Username/Password
+        response = restTemplate.postForEntity("/api/users/login", credentials4, LoginRE.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        errors = response.getBody().getErrors();
+        assertThat(errors).contains("Invalid credentials.");
+
+        // Correct Credentials
+        response = restTemplate.postForEntity("/api/users/login", credentials1, LoginRE.class);
+        errors = response.getBody().getErrors();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(errors).isEmpty();
+
+        authToken = response.getBody().getToken();
+        assertThat(authToken).isNotNull();
     }
 
 
