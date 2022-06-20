@@ -28,7 +28,6 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import tqs.g11.zap.auth.TokenProvider;
 import tqs.g11.zap.auth.UnauthorizedEntryPoint;
 import tqs.g11.zap.dto.CartCheckoutPostDTO;
-import tqs.g11.zap.dto.CartProductRE;
 import tqs.g11.zap.dto.CartProductsRE;
 import tqs.g11.zap.enums.ErrorMsg;
 import tqs.g11.zap.enums.UserRoles;
