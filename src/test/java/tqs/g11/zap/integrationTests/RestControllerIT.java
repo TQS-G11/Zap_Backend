@@ -131,6 +131,7 @@ class RestControllerIT {
         signUp();
         login();
         createProducts();
+        getProducts();
     }
 
 
@@ -220,30 +221,21 @@ class RestControllerIT {
         assertThat(response.getBody().getProductId()).isEqualTo(p3.getProductId());
     }
 
-    // @Test
-    // @Order(4)
-    // void getProducts() {
 
-    //     //productRep.save(p1);
-    //     //productRep.save(p2);
-    //     //productRep.save(p3);
-    //     //productRep.flush();
+    void getProducts() {
 
-    //     ResponseEntity<List<Product>> response = restTemplate.exchange(
-    //                                                         "/zap/products",
-    //                                                         HttpMethod.GET,
-    //                                                         null,
-    //                                                         new ParameterizedTypeReference<List<Product>>(){}
-    //     );
+        ResponseEntity<List<Product>> response = restTemplate.exchange(
+                                                            "/zap/products",
+                                                            HttpMethod.GET,
+                                                            null,
+                                                            new ParameterizedTypeReference<List<Product>>(){}
+        );
 
-    //     assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
-    //     assertThat(response.getBody())
-    //         .extracting(Product::getProductId)
-    //         .contains(p1.getProductId(),p2.getProductId(),p3.getProductId());
-
-
-
-    // }
+        assertThat(response.getStatusCode()).isEqualByComparingTo(HttpStatus.OK);
+        assertThat(response.getBody())
+            .extracting(Product::getProductId)
+            .contains(p1.getProductId(),p2.getProductId(),p3.getProductId());
+    }
 
     // @Test
     // void checkoutCart(){
