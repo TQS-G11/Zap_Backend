@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 
 import tqs.g11.zap.dto.AuthToken;
 import tqs.g11.zap.dto.CartProductPost;
+import tqs.g11.zap.dto.CartProductRE;
 import tqs.g11.zap.dto.CartProductsRE;
 import tqs.g11.zap.dto.LoginRE;
 import tqs.g11.zap.dto.LoginUser;
@@ -28,13 +29,9 @@ import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.model.User;
 import tqs.g11.zap.repository.CartRepository;
-import tqs.g11.zap.repository.ProductRepository;
 import tqs.g11.zap.repository.UsersRepository;
 
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
-
-
-import tqs.g11.zap.service.UsersService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,6 +53,9 @@ class RestControllerIT {
 
     @Autowired
     private UsersRepository usersRep;
+
+    @Autowired
+    private CartRepository cartRep;
 
     private User user1 = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
     private User user2 = new User("user2", "Deinis Lie", "sussybot564", UserRoles.CLIENT);
@@ -88,7 +88,8 @@ class RestControllerIT {
         getProductById();
         addCartProduct();
         getUserCart();
-        //checkoutCart();
+        checkoutCart();
+        deleteCartProduct();
     }
 
 
@@ -247,7 +248,7 @@ class RestControllerIT {
         map.put("quantity", productPost.getQuantity());
         HttpEntity<Map<String,Object>> request = new HttpEntity<>(map, headers);
 
-        ResponseEntity<CartProductPost> response = restTemplate.postForEntity("/zap/cart/add", request, CartProductPost.class);
+        ResponseEntity<CartProductRE> response = restTemplate.postForEntity("/zap/cart/add", request, CartProductRE.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         //assertThat(response.getBody().getProductId()).isEqualTo(p3.getProductId());
     }
@@ -322,7 +323,35 @@ class RestControllerIT {
         //System.out.println(request.getBody().get("cartCheckoutPostDTO").getDestination());
         response = restTemplate.postForEntity("/zap/cart/checkout", request, CartProductsRE.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(cartRep.findByUserId(user3.getId())).isEmpty();
+
     
     }
     
+
+    void deleteCartProduct() {
+        System.out.println("DELETE");
+        CartProductPost productPost = new CartProductPost(p1.getProductId(), 1);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(user2AuthToken.getToken());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("productId", productPost.getProductId());
+        map.put("quantity", productPost.getQuantity());
+        HttpEntity<Map<String,Object>> request = new HttpEntity<>(map, headers);
+        ResponseEntity<CartProductRE> resp = restTemplate.postForEntity("/zap/cart/add", request, CartProductRE.class);
+
+        ResponseEntity<CartProductRE> response = restTemplate.exchange(
+            "/zap/cart/" + resp.getBody().getCartProduct().getId(),
+            HttpMethod.DELETE,
+            request,
+            CartProductRE.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
+        assertThat(cartRep.findByUserId(user2.getId())).isEmpty();
+
+
+    }
 }

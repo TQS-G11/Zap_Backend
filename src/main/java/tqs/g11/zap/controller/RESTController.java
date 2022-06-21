@@ -148,6 +148,8 @@ public class RESTController {
     @PreAuthorize("hasAnyRole('CLIENT')")
     @DeleteMapping("/cart/{cart_id}")
     public ResponseEntity<CartProductRE> clientDeleteCart(Authentication auth, @PathVariable("cart_id") Long cartId) {
+        System.out.println("AAAAAAAAAAAA");
+        System.out.println(cartId);
         return cartService.deleteCartById(auth, cartId);
     }
 
