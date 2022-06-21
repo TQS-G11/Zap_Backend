@@ -108,19 +108,21 @@ public class CartService {
                         + cartProduct.getProduct().getProductId() + ")");
         }));
 
-        if (cartCheckoutPostDTO.getDestination().equals("") || cartCheckoutPostDTO.getDestination() == null) {
+        if (cartCheckoutPostDTO.getDestination() == null || cartCheckoutPostDTO.getDestination().equals("")) {
             re.addError(ErrorMsg.DESTINATION_NOT_GIVEN.toString());
         }
 
         if (cart.isEmpty()) {
             re.addError(ErrorMsg.NOT_CART_PRODUCT.toString());
         }
-
+        System.out.println(re.getErrors());
         if (re.getErrors().isEmpty()) {
             TqsBasicHttpClient httpClient = new TqsBasicHttpClient();
             String username = client.getUsername();
             LoginUser loginUser = new LoginUser(storeUsername, storePassword);
             JsonObject loginResponse = httpClient.doHttpPost(deliverizeLogin, loginUser, null);
+            System.out.println("+*****+");
+            System.out.println(loginResponse);
             String token = loginResponse.getAsJsonObject("token").get("token").getAsString();
 
             OrderPostDTO orderPostDTO = new OrderPostDTO(username, cartCheckoutPostDTO.getDestination(),
@@ -139,8 +141,8 @@ public class CartService {
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(re);
             }
         }
-
-        return ResponseEntity.badRequest().body(re);
+        System.out.println("--------.............-----------");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(re);
     }
 
     public ResponseEntity<CartProductRE> deleteCartById(Authentication auth, Long cartId) {

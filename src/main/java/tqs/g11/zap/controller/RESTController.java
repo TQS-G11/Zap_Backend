@@ -134,7 +134,12 @@ public class RESTController {
     @PostMapping("/cart/checkout")
     @SneakyThrows
     public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, @RequestBody CartCheckoutPostDTO cartCheckoutPostDTO) {
-        return cartService.clientCartCheckout(auth, cartCheckoutPostDTO);
+        System.out.println(auth);
+        System.out.println("WTF");
+        System.out.println(cartCheckoutPostDTO.getDestination());
+        ResponseEntity<CartProductsRE> resp = cartService.clientCartCheckout(auth, cartCheckoutPostDTO);
+        System.out.println(resp.getStatusCode());
+        return resp;
 
     }
 

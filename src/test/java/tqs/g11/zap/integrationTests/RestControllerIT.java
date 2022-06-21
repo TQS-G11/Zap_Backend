@@ -83,16 +83,17 @@ class RestControllerIT {
                                     user1, 23.4, "Charger"
     );
 
-    private AuthToken authToken;
+    private AuthToken user1AuthToken;
+    private AuthToken user2AuthToken;
 
 
     @Test
     void runTests() throws JsonProcessingException{
         signUp();
         login();
-        createProducts();
-        getProducts();
-        getProductById();
+        //createProducts();
+        //getProducts();
+        //getProductById();
         checkoutCart();
     }
 
@@ -118,6 +119,7 @@ class RestControllerIT {
         LoginUser credentials2 = new LoginUser(user1.getUsername(), "");
         LoginUser credentials3 = new LoginUser("", user1.getPassword());
         LoginUser credentials4 = new LoginUser("Name", "Password");
+        LoginUser credentials5 = new LoginUser(user2.getUsername(), user2.getPassword());
 
         // Blank password
         ResponseEntity<LoginRE> response = restTemplate.postForEntity("/api/users/login", credentials2, LoginRE.class);
@@ -143,9 +145,13 @@ class RestControllerIT {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(errors).isEmpty();
 
-        authToken = response.getBody().getToken();
+        user1AuthToken = response.getBody().getToken();
 
-        assertThat(authToken).isNotNull();
+        assertThat(user1AuthToken).isNotNull();
+
+        response = restTemplate.postForEntity("/api/users/login", credentials5, LoginRE.class);
+        user2AuthToken = response.getBody().getToken();
+        assertThat(user2AuthToken).isNotNull();
     }
 
     void createProducts(){
@@ -154,7 +160,7 @@ class RestControllerIT {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(authToken.getToken());
+        headers.setBearerAuth(user1AuthToken.getToken());
 
         Map<String, Product> map = new HashMap<>();
         map.put("product", p1);
@@ -217,17 +223,23 @@ class RestControllerIT {
         HttpHeaders headers = new HttpHeaders();
         
         CartCheckoutPostDTO details = new CartCheckoutPostDTO("Aveiro", "Hello :)");
-        Map<String, CartCheckoutPostDTO> map = new HashMap<>();
-        map.put("cartCheckoutPostDTO", details);
-        HttpEntity<Map<String,Product>> request = new HttpEntity(map, headers);
+        System.out.println(details.getDestination());
+        Map<String, String> map = new HashMap<>();
+        //map.put("cartCheckoutPostDTO", details);
+        map.put("destination", "Aveiro");
+        map.put("notes", "Hello :)");
+
+        HttpEntity<Map<String,CartCheckoutPostDTO>> request = new HttpEntity(map);
 
         ResponseEntity<CartProductsRE> response = restTemplate.postForEntity("/zap/cart/checkout", request, CartProductsRE.class);
             
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 
-        headers.setBearerAuth(authToken.getToken());
-
-
+        headers.setBearerAuth(user2AuthToken.getToken());
+        request = new HttpEntity(map, headers);
+        //System.out.println(request.getBody().get("cartCheckoutPostDTO").getDestination());
+        response = restTemplate.postForEntity("/zap/cart/checkout", request, CartProductsRE.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
         //assertThat(response.getBody()).contains("Checkout Successful");
     
