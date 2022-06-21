@@ -29,7 +29,7 @@ import tqs.g11.zap.service.ProductService;
 @CrossOrigin("*")
 @RequestMapping("/zap")
 public class RESTController {
-    
+
 
     private final ProductService productService;
     private final CartService cartService;
@@ -41,19 +41,19 @@ public class RESTController {
         this.orderService = orderService;
     }
 
-    @Operation(summary = "Fetch all products available on the store")
+    @Operation(summary = "Fetch all products available on the store. Also can filter by their Names and Categories.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Products Found")
+            @ApiResponse(responseCode = "200", description = "Products Found")
     })
     @GetMapping("/products")
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> data = productService.getProducts();
+    public ResponseEntity<List<Product>> getAllProducts(String name, String category) {
+        List<Product> data = productService.filterProducts(name, category);
         return ResponseEntity.ok().body(data);
     }
 
     @Operation(summary = "Fetch a specific product by its id")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product Found")
+            @ApiResponse(responseCode = "200", description = "Product Found")
     })
     @GetMapping("/products/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
@@ -63,9 +63,9 @@ public class RESTController {
 
     @Operation(summary = "Create a product on the store")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Product Created"),
-        @ApiResponse(responseCode = "401", description = "Unauthenticated."),
-        @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
+            @ApiResponse(responseCode = "201", description = "Product Created"),
+            @ApiResponse(responseCode = "401", description = "Unauthenticated."),
+            @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
     })
     @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/products")
@@ -77,9 +77,9 @@ public class RESTController {
 
     @Operation(summary = "Fetch the cart of a specific User by User id")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Cart Found"),
-        @ApiResponse(responseCode = "401", description = "Unauthenticated."),
-        @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
+            @ApiResponse(responseCode = "200", description = "Cart Found"),
+            @ApiResponse(responseCode = "401", description = "Unauthenticated."),
+            @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
     })
     @GetMapping("/carts/user/{user_id}")
     public ResponseEntity<List<CartProduct>> getCartsByUserId(@PathVariable("user_id") Long userId) {
@@ -87,11 +87,12 @@ public class RESTController {
         return ResponseEntity.ok().body(cartProducts);
     }
 
+
     @Operation(summary = "Delete the cart of a specific User")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Cart Deleted"),
-        @ApiResponse(responseCode = "401", description = "Unauthenticated."),
-        @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
+            @ApiResponse(responseCode = "200", description = "Cart Deleted"),
+            @ApiResponse(responseCode = "401", description = "Unauthenticated."),
+            @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
     })
     @DeleteMapping("/carts/user/{user_id}")
     public ResponseEntity<List<CartProduct>> deleteCartsByUserId(@PathVariable("user_id") Long userId) {
@@ -102,9 +103,9 @@ public class RESTController {
 
     @Operation(summary = "Fetch the cart of a specific User by authorization token")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Cart Found"),
-        @ApiResponse(responseCode = "401", description = "Unauthenticated."),
-        @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
+            @ApiResponse(responseCode = "200", description = "Cart Found"),
+            @ApiResponse(responseCode = "401", description = "Unauthenticated."),
+            @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
     })
     @PreAuthorize("hasAnyRole('CLIENT')")
     @GetMapping("/cart")
@@ -115,9 +116,9 @@ public class RESTController {
 
     @Operation(summary = "Add Product to the Cart")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product added"),
-        @ApiResponse(responseCode = "401", description = "Unauthenticated."),
-        @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
+            @ApiResponse(responseCode = "200", description = "Product added"),
+            @ApiResponse(responseCode = "401", description = "Unauthenticated."),
+            @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
     })
     @PreAuthorize("hasAnyRole('CLIENT')")
     @PostMapping("/cart/add")
@@ -127,9 +128,9 @@ public class RESTController {
 
     @Operation(summary = "Checkout the Cart")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Checkout Sucessful"),
-        @ApiResponse(responseCode = "401", description = "Unauthenticated."),
-        @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
+            @ApiResponse(responseCode = "200", description = "Checkout Sucessful"),
+            @ApiResponse(responseCode = "401", description = "Unauthenticated."),
+            @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
     })
     @PreAuthorize("hasAnyRole('CLIENT')")
     @PostMapping("/cart/checkout")
@@ -141,9 +142,9 @@ public class RESTController {
 
     @Operation(summary = "Delete the Cart")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Cart Deleted"),
-        @ApiResponse(responseCode = "401", description = "Unauthenticated."),
-        @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
+            @ApiResponse(responseCode = "200", description = "Cart Deleted"),
+            @ApiResponse(responseCode = "401", description = "Unauthenticated."),
+            @ApiResponse(responseCode = "403", description = "Unauthorized (not the correct User).")
     })
     @PreAuthorize("hasAnyRole('CLIENT')")
     @DeleteMapping("/cart/{cart_id}")

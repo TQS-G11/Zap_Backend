@@ -127,6 +127,7 @@ public class CartService {
             if (errors.size() == 0) {
                 re.setCartProducts(cart);
                 JsonObject jsonOrder = orderResponse.getAsJsonObject("orderDto");
+                deleteCartsByUserId(client.getId());
                 Long orderId = jsonOrder.get("id").getAsLong();
 
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(re);
