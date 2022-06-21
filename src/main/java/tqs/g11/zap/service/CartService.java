@@ -81,6 +81,8 @@ public class CartService {
         if (productOpt.isEmpty())
             re.addError(ErrorMsg.PRODUCT_NOT_FOUND.toString());
         else {
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAA");
+            System.out.println(productOpt.get());
             product = productOpt.get();
             if (product.getQuantity() < cartProductPost.getQuantity())
                 re.addError(ErrorMsg.PRODUCT_NOT_ENOUGH_STOCK.toString());

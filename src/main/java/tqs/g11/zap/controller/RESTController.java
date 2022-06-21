@@ -121,6 +121,8 @@ public class RESTController {
     @PreAuthorize("hasAnyRole('CLIENT')")
     @PostMapping("/cart/add")
     public ResponseEntity<CartProductRE> clientAddCartProduct(Authentication auth, @RequestBody CartProductPost cartProductPost) {
+        System.out.println("id: " + cartProductPost.getProductId());
+        System.out.println("quantity: " + cartProductPost.getQuantity());
         return cartService.clientAddCartProduct(auth, cartProductPost);
     }
 
