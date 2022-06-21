@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 //import org.springframework.test.context.TestPropertySource;
 
 import tqs.g11.zap.dto.AuthToken;
-import tqs.g11.zap.dto.CartCheckoutPostDTO;
 import tqs.g11.zap.dto.CartProductPost;
 import tqs.g11.zap.dto.CartProductsRE;
 import tqs.g11.zap.dto.LoginRE;
@@ -25,7 +24,7 @@ import tqs.g11.zap.dto.LoginUser;
 import tqs.g11.zap.dto.SignupRE;
 import tqs.g11.zap.dto.UserDto;
 import tqs.g11.zap.enums.UserRoles;
-
+import tqs.g11.zap.model.CartProduct;
 import tqs.g11.zap.model.Product;
 import tqs.g11.zap.model.User;
 import tqs.g11.zap.repository.CartRepository;
@@ -56,16 +55,7 @@ class RestControllerIT {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private CartRepository cartRep;
-
-    @Autowired
-    private ProductRepository productRep;
-
-    @Autowired
     private UsersRepository usersRep;
-
-    @Autowired
-    private UsersService usersService;
 
     private User user1 = new User("user1", "Caio Costela", "amogus123", UserRoles.MANAGER);
     private User user2 = new User("user2", "Deinis Lie", "sussybot564", UserRoles.CLIENT);
@@ -97,7 +87,8 @@ class RestControllerIT {
         getProducts();
         getProductById();
         addCartProduct();
-        checkoutCart();
+        getUserCart();
+        //checkoutCart();
     }
 
 
@@ -172,10 +163,7 @@ class RestControllerIT {
 
         Map<String, Object> map = new HashMap<>();
         map.put("product", p1);
-        /*
-    private Product p1 = new Product(1L, "Among Us Pen Drive", 
-                                    "url1", "An Among Us pen drive", 69, 
-                                    user1, 420.69, "Pen Drive" */
+        
         map.put("name",  p1.getName());
         map.put("img", p1.getImg());
         map.put("description", p1.getDescription());
@@ -260,11 +248,54 @@ class RestControllerIT {
         HttpEntity<Map<String,Object>> request = new HttpEntity<>(map, headers);
 
         ResponseEntity<CartProductPost> response = restTemplate.postForEntity("/zap/cart/add", request, CartProductPost.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         //assertThat(response.getBody().getProductId()).isEqualTo(p3.getProductId());
     }
 
+    void getUserCart(){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(user3AuthToken.getToken());
 
+        HttpEntity<Object> request = new HttpEntity<>(headers);
+
+        ResponseEntity<List<CartProduct>> response = restTemplate.exchange(
+            "/zap/cart",
+            HttpMethod.GET,
+            request,
+            new ParameterizedTypeReference<List<CartProduct>>(){}
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody())
+            .extracting((cp) -> cp.getProduct().getProductId())
+            .contains(p1.getProductId());
+
+        headers.setBearerAuth(user2AuthToken.getToken());
+
+        request = new HttpEntity<>(headers);
+
+        response = restTemplate.exchange(
+            "/zap/cart",
+            HttpMethod.GET,
+            request,
+            new ParameterizedTypeReference<List<CartProduct>>(){}
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEmpty();
+
+        headers.setBearerAuth("BogoTokenSusAmogiPoggersParaDeOlahrLuciusSenão...");
+        request = new HttpEntity<>(headers);
+
+        response = restTemplate.exchange(
+            "/zap/cart",
+            HttpMethod.GET,
+            request,
+            new ParameterizedTypeReference<List<CartProduct>>(){}
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
 
     void checkoutCart(){
 
