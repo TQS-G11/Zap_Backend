@@ -8,12 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import tqs.g11.zap.client.TqsBasicHttpClient;
-import tqs.g11.zap.dto.CartCheckoutPostDTO;
-import tqs.g11.zap.dto.CartProductPost;
-import tqs.g11.zap.dto.CartProductRE;
-import tqs.g11.zap.dto.CartProductsRE;
-import tqs.g11.zap.dto.LoginUser;
-import tqs.g11.zap.dto.OrderPostDTO;
+import tqs.g11.zap.dto.*;
 import tqs.g11.zap.enums.ErrorMsg;
 import tqs.g11.zap.enums.UserRoles;
 import tqs.g11.zap.model.*;
@@ -130,10 +125,9 @@ public class CartService {
             if (errors.size() == 0) {
                 re.setCartProducts(cart);
                 JsonObject jsonOrder = orderResponse.getAsJsonObject("orderDto");
+                deleteCartsByUserId(client.getId());
                 Long orderId = jsonOrder.get("id").getAsLong();
 
-                Order order = new Order(orderId, client);
-                orderService.save(order);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(re);
             }
         }

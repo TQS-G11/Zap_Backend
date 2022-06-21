@@ -21,6 +21,13 @@ public class ProductService {
         this.usersService = usersService;
     }
 
+    public List<Product> filterProducts(String name, String category) {
+        if (name == null && category == null) return getProducts();
+        if (name == null) return getProductsByCategory(category);
+        if (category == null) return getProductsByName(name);
+        return getProductsByNameAndCategory(name, category);
+    }
+
     public List<Product> getProducts() {
         return productRepository.findAll();
     }

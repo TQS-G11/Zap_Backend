@@ -190,6 +190,10 @@
 					<goal>verify</goal>
 				</goals>
 			</plugin>
+			<plugin>
+    				<artifactId>maven-war-plugin</artifactId>
+    				<version>3.3.1</version>
+			</plugin>
 		</plugins>
 	</build>
 

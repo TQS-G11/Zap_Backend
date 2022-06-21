@@ -18,7 +18,7 @@ public class OrdersRE {
 
     @Getter
     @Setter
-    private List<DeliverizeOrder> orders;
+    private List<DeliverizeOrder> orders = new ArrayList<>();
 
     public void addError(String error) {
         errors.add(error);
