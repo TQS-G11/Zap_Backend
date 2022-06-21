@@ -100,7 +100,7 @@ public class CartService {
 
     public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, CartCheckoutPostDTO cartCheckoutPostDTO) throws IOException {
         CartProductsRE re = new CartProductsRE();
-        System.out.println("Sussy test");
+
         User client = usersService.getAuthUser((UserDetails) auth.getPrincipal());
         assert client.getRole().equals(UserRoles.CLIENT.toString());
         List<CartProduct> cart = getCartsByUser(client);
@@ -117,21 +117,17 @@ public class CartService {
         if (cart.isEmpty()) {
             re.addError(ErrorMsg.NOT_CART_PRODUCT.toString());
         }
-        System.out.println(re.getErrors());
+
         if (re.getErrors().isEmpty()) {
             TqsBasicHttpClient httpClient = new TqsBasicHttpClient();
             String username = client.getUsername();
             LoginUser loginUser = new LoginUser(storeUsername, storePassword);
             JsonObject loginResponse = httpClient.doHttpPost(deliverizeLogin, loginUser, null);
-            System.out.println("+*****+");
-            System.out.println(loginResponse);
             String token = loginResponse.getAsJsonObject("token").get("token").getAsString();
 
             OrderPostDTO orderPostDTO = new OrderPostDTO(username, cartCheckoutPostDTO.getDestination(),
                 cartCheckoutPostDTO.getNotes(), storeName, storeLat, storeLon);
             JsonObject orderResponse = httpClient.doHttpPost(deliverizeOrder, orderPostDTO, token);
-            System.out.println("orderResponse");
-            System.out.println(orderResponse.toString());
             JsonArray errors = orderResponse.getAsJsonArray("errors");
             if (errors.size() == 0) {
                 re.setCartProducts(cart);
@@ -143,7 +139,7 @@ public class CartService {
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(re);
             }
         }
-        System.out.println("--------.............-----------");
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(re);
     }
 

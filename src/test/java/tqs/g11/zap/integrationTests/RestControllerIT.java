@@ -94,8 +94,8 @@ class RestControllerIT {
         signUp();
         login();
         createProducts();
-        //getProducts();
-        //getProductById();
+        getProducts();
+        getProductById();
         addCartProduct();
         checkoutCart();
     }
@@ -260,11 +260,8 @@ class RestControllerIT {
         HttpEntity<Map<String,Object>> request = new HttpEntity<>(map, headers);
 
         ResponseEntity<CartProductPost> response = restTemplate.postForEntity("/zap/cart/add", request, CartProductPost.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
         //assertThat(response.getBody().getProductId()).isEqualTo(p3.getProductId());
-
-
-
     }
 
 
@@ -272,9 +269,6 @@ class RestControllerIT {
     void checkoutCart(){
 
         HttpHeaders headers = new HttpHeaders();
-        
-        CartCheckoutPostDTO details = new CartCheckoutPostDTO("Aveiro", "Hello :)");
-        System.out.println(details.getDestination());
         Map<String, Object> map = new HashMap<>();
         //map.put("cartCheckoutPostDTO", details);
         map.put("destination", "Aveiro");
