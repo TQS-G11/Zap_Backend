@@ -27,7 +27,7 @@ jobs:
         with:
           java-version: 11
       - name: Build and Test
-        run: docker-compose -f "docker_compose_test.yml" up --build  --exit-code-from deliverize_app
+        run: docker-compose -f "docker_compose_test.yml" up --build  --exit-code-from zap_app
    
   deploy:
     needs: build
