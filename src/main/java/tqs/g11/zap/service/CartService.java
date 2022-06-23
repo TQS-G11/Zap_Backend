@@ -93,7 +93,7 @@ public class CartService {
 
     public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, CartCheckoutPostDTO cartCheckoutPostDTO) throws IOException {
         CartProductsRE re = new CartProductsRE();
-        System.out.println("Sussy test");
+
         User client = usersService.getAuthUser((UserDetails) auth.getPrincipal());
         assert client.getRole().equals(UserRoles.CLIENT.toString());
         List<CartProduct> cart = getCartsByUser(client);
@@ -103,7 +103,7 @@ public class CartService {
                         + cartProduct.getProduct().getProductId() + ")");
         }));
 
-        if (cartCheckoutPostDTO.getDestination().equals("") || cartCheckoutPostDTO.getDestination() == null) {
+        if (cartCheckoutPostDTO.getDestination() == null || cartCheckoutPostDTO.getDestination().equals("")) {
             re.addError(ErrorMsg.DESTINATION_NOT_GIVEN.toString());
         }
 
@@ -121,8 +121,6 @@ public class CartService {
             OrderPostDTO orderPostDTO = new OrderPostDTO(username, cartCheckoutPostDTO.getDestination(),
                 cartCheckoutPostDTO.getNotes(), storeName, storeLat, storeLon);
             JsonObject orderResponse = httpClient.doHttpPost(deliverizeOrder, orderPostDTO, token);
-//            System.out.println("orderResponse");
-//            System.out.println(orderResponse.toString());
             JsonArray errors = orderResponse.getAsJsonArray("errors");
             if (errors.size() == 0) {
                 re.setCartProducts(cart);
@@ -134,7 +132,7 @@ public class CartService {
             }
         }
 
-        return ResponseEntity.badRequest().body(re);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(re);
     }
 
     public ResponseEntity<CartProductRE> deleteCartById(Authentication auth, Long cartId) {

@@ -123,6 +123,8 @@ public class RESTController {
     @PreAuthorize("hasAnyRole('CLIENT')")
     @PostMapping("/cart/add")
     public ResponseEntity<CartProductRE> clientAddCartProduct(Authentication auth, @RequestBody CartProductPost cartProductPost) {
+        System.out.println("id: " + cartProductPost.getProductId());
+        System.out.println("quantity: " + cartProductPost.getQuantity());
         return cartService.clientAddCartProduct(auth, cartProductPost);
     }
 
@@ -137,7 +139,6 @@ public class RESTController {
     @SneakyThrows
     public ResponseEntity<CartProductsRE> clientCartCheckout(Authentication auth, @RequestBody CartCheckoutPostDTO cartCheckoutPostDTO) {
         return cartService.clientCartCheckout(auth, cartCheckoutPostDTO);
-
     }
 
     @Operation(summary = "Delete the Cart")
@@ -149,6 +150,8 @@ public class RESTController {
     @PreAuthorize("hasAnyRole('CLIENT')")
     @DeleteMapping("/cart/{cart_id}")
     public ResponseEntity<CartProductRE> clientDeleteCart(Authentication auth, @PathVariable("cart_id") Long cartId) {
+        System.out.println("AAAAAAAAAAAA");
+        System.out.println(cartId);
         return cartService.deleteCartById(auth, cartId);
     }
 
